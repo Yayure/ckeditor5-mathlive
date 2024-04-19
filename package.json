@@ -1,0 +1,95 @@
+{
+  "name": "@yayure/ckeditor5-mathlive",
+  "version": "0.0.1",
+  "description": "A plugin for CKEditor 5.",
+  "keywords": [
+    "ckeditor",
+    "ckeditor5",
+    "ckeditor 5",
+    "ckeditor5-feature",
+    "ckeditor5-plugin",
+    "ckeditor5-dll",
+    "ckeditor5-package-generator"
+  ],
+  "main": "src/index.ts",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=5.7.1"
+  },
+  "files": [
+    "lang",
+    "src/**/*.js",
+    "src/**/*.d.ts",
+    "theme",
+    "build",
+    "ckeditor5-metadata.json"
+  ],
+  "devDependencies": {
+    "@ckeditor/ckeditor5-autoformat": ">=41.3.1",
+    "@ckeditor/ckeditor5-basic-styles": ">=41.3.1",
+    "@ckeditor/ckeditor5-block-quote": ">=41.3.1",
+    "@ckeditor/ckeditor5-code-block": ">=41.3.1",
+    "@ckeditor/ckeditor5-core": ">=41.3.1",
+    "@ckeditor/ckeditor5-editor-classic": ">=41.3.1",
+    "@ckeditor/ckeditor5-essentials": ">=41.3.1",
+    "@ckeditor/ckeditor5-heading": ">=41.3.1",
+    "@ckeditor/ckeditor5-image": ">=41.3.1",
+    "@ckeditor/ckeditor5-indent": ">=41.3.1",
+    "@ckeditor/ckeditor5-inspector": ">=4.1.0",
+    "@ckeditor/ckeditor5-link": ">=41.3.1",
+    "@ckeditor/ckeditor5-list": ">=41.3.1",
+    "@ckeditor/ckeditor5-media-embed": ">=41.3.1",
+    "@ckeditor/ckeditor5-package-tools": "^1.1.0",
+    "@ckeditor/ckeditor5-paragraph": ">=41.3.1",
+    "@ckeditor/ckeditor5-table": ">=41.3.1",
+    "@ckeditor/ckeditor5-theme-lark": ">=41.3.1",
+    "@ckeditor/ckeditor5-upload": ">=41.3.1",
+    "@types/chai": "^4.3.1",
+    "@types/mocha": "^9.1.1",
+    "@typescript-eslint/eslint-plugin": "~5.43.0",
+    "@typescript-eslint/parser": "^5.18.0",
+    "ckeditor5": ">=41.3.1",
+    "eslint": "^7.32.0",
+    "eslint-config-ckeditor5": ">=5.3.2",
+    "http-server": "^14.1.0",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.6",
+    "stylelint": "^13.13.1",
+    "stylelint-config-ckeditor5": ">=5.3.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.7.4"
+  },
+  "peerDependencies": {
+    "ckeditor5": ">=41.3.1"
+  },
+  "scripts": {
+    "ts:build": "tsc -p ./tsconfig.release.json",
+    "ts:clear": "npx rimraf \"src/**/*.@(js|d.ts)\"",
+    "dll:build": "ckeditor5-package-tools dll:build",
+    "dll:serve": "http-server ./ -o sample/dll.html",
+    "lint": "eslint \"**/*.{js,ts}\" --quiet",
+    "start": "ckeditor5-package-tools start",
+    "stylelint": "stylelint --quiet --allow-empty-input 'theme/**/*.css'",
+    "test": "ckeditor5-package-tools test",
+    "prepare": "npm run dll:build",
+    "prepublishOnly": "npm run ts:build && ckeditor5-package-tools export-package-as-javascript",
+    "postpublish": "npm run ts:clear && ckeditor5-package-tools export-package-as-typescript",
+    "translations:collect": "ckeditor5-package-tools translations:collect",
+    "translations:download": "ckeditor5-package-tools translations:download",
+    "translations:upload": "ckeditor5-package-tools translations:upload"
+  },
+  "lint-staged": {
+    "**/*.{js,ts}": [
+      "eslint --quiet"
+    ],
+    "**/*.css": [
+      "stylelint --quiet --allow-empty-input"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  }
+}

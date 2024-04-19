@@ -1,0 +1,17 @@
+{
+  "plugins": [
+    {
+      "name": "Mathlive",
+      "className": "Mathlive",
+      "description": "Adds text to the editor.",
+      "path": "src/mathlive.ts",
+      "uiComponents": [
+        {
+          "name": "mathliveButton",
+          "type": "Button",
+          "iconPath": "theme/icons/ckeditor.svg"
+        }
+      ]
+    }
+  ]
+}
