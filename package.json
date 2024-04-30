@@ -1,6 +1,6 @@
 {
   "name": "@yayure/ckeditor5-mathlive",
-  "version": "0.0.1",
+  "version": "41.3.1",
   "description": "A plugin for CKEditor 5.",
   "keywords": [
     "ckeditor",
@@ -9,7 +9,9 @@
     "ckeditor5-feature",
     "ckeditor5-plugin",
     "ckeditor5-dll",
-    "ckeditor5-package-generator"
+    "ckeditor5-package-generator",
+    "ckeditor5-mathlive",
+    "mathlive"
   ],
   "main": "src/index.ts",
   "license": "MIT",
@@ -55,6 +57,7 @@
     "http-server": "^14.1.0",
     "husky": "^4.2.5",
     "lint-staged": "^10.2.6",
+    "mathlive": "^0.98.6",
     "stylelint": "^13.13.1",
     "stylelint-config-ckeditor5": ">=5.3.2",
     "ts-node": "^10.9.1",

@@ -1,8 +1,8 @@
-import ckeditor from './../theme/icons/ckeditor.svg';
+import mathlive from './../theme/icons/mathlive.svg';
 import './augmentation';
 
 export { default as Mathlive } from './mathlive';
 
 export const icons = {
-	ckeditor
+	mathlive
 };

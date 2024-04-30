@@ -52,7 +52,7 @@ ClassicEditor
 			Base64UploadAdapter
 		],
 		toolbar: [
-			'mathliveButton',
+			'mathlive',
 			'|',
 			'heading',
 			'|',
