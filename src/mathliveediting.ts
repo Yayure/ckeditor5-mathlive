@@ -5,9 +5,9 @@ import {
 	Widget,
 	viewToModelPositionOutsideModelElement
 } from 'ckeditor5/src/widget';
-import { extractDelimiters, styleObjectToCssString } from './utils';
-import type { DowncastWriter, Element } from 'ckeditor5/src/engine';
-import { CKEditorError, global } from 'ckeditor5/src/utils';
+import { extractDelimiters } from './utils';
+import type { DowncastWriter, Element, ViewElement, Writer } from 'ckeditor5/src/engine';
+import { CKEditorError } from 'ckeditor5/src/utils';
 import MathlivePanelView from './ui/panel/index.mathlive';
 
 export default class MathliveEditing extends Plugin {
@@ -32,30 +32,14 @@ export default class MathliveEditing extends Plugin {
 					panelView = null;
 				};
 			},
-			renderMathTex: ( equation, element ) => {
-				const config = this.editor.config.get( 'mathlive' );
-
-				const document = global.document;
-				const mathFieldWrapper = document.createElement( 'span' );
-				mathFieldWrapper.className = 'ck-math-field';
-				const mathField = document.createElement( 'math-field' );
-				mathField.setAttribute( 'read-only', '' );
-				const inlineStyle = config?.mathFieldStyle ? styleObjectToCssString( config.mathFieldStyle ) : '';
-				mathField.setAttribute( 'style', inlineStyle );
-
-				mathField.innerText = equation;
-				mathFieldWrapper.appendChild( mathField );
-				element.appendChild( mathFieldWrapper );
-			},
-			engine: 'mathlive',
-			mathFieldStyle: {
-				display: 'inline-block',
-				padding: '0',
-				border: 'none',
-				color: 'inherit',
-				backgroundColor: 'inherit'
-			},
-			className: 'ck-mathlive-tex'
+			processClass: 'tex2jax_process',
+			processScriptType: 'math/tex',
+			output: {
+				type: 'script',
+				attributes: {
+					type: 'math/tex'
+				}
+			}
 		} );
 	}
 
@@ -81,7 +65,7 @@ export default class MathliveEditing extends Plugin {
 			allowWhere: '$text',
 			isInline: true,
 			isObject: true,
-			allowAttributes: [ 'alignment', 'fontSize', 'fontColor', 'fontBackgroundColor', 'equation', 'engine' ]
+			allowAttributes: [ 'alignment', 'fontSize', 'fontColor', 'fontBackgroundColor', 'equation' ]
 		} );
 	}
 
@@ -92,30 +76,43 @@ export default class MathliveEditing extends Plugin {
 		// View -> Model
 		conversion
 			.for( 'upcast' )
-			// (e.g. <span class="ck-mathlive-tex">\( \sqrt{\frac{a}{b}} \)</span>)
+			// (e.g. <span class="tex2jax_process">\( \sqrt{\frac{a}{b}} \)</span>)
 			.elementToElement( {
 				view: {
-					name: 'span',
-					classes: [ mathliveConfig.className! ]
+					classes: [ mathliveConfig.processClass! ]
 				},
-				model: ( viewElement, { writer } ) => {
-					const child = viewElement.getChild( 0 );
-					if ( child?.is( '$text' ) ) {
-						const equation = child.data.trim();
-
-						const params = Object.assign( extractDelimiters( equation ), {
-							engine: mathliveConfig.engine
-						} );
-
-						return writer.createElement(
-							'mathlive-mathtex',
-							params
-						);
+				model: createMathtexModel
+			} )
+			// (e.g. <script type="math/tex">\( \sqrt{\frac{a}{b}} \)</script>)
+			.elementToElement( {
+				view: {
+					name: 'script',
+					attributes: {
+						type: 'math/tex'
 					}
-
-					return null;
-				}
+				},
+				model: createMathtexModel
 			} );
+
+		// Create view for Model
+		function createMathtexModel(
+			viewElement: ViewElement,
+			{ writer }: { writer: Writer }
+		) {
+			const child = viewElement.getChild( 0 );
+			if ( child?.is( '$text' ) ) {
+				const equation = child.data.trim();
+
+				const params = extractDelimiters( equation );
+
+				return writer.createElement(
+					'mathlive-mathtex',
+					params
+				);
+			}
+
+			return null;
+		}
 
 		// Model -> View (element)
 		conversion
@@ -154,19 +151,34 @@ export default class MathliveEditing extends Plugin {
 				}
 			);
 
-			const uiElement = writer.createUIElement(
-				'div',
-				null,
-				function( domDocument ) {
-					const domElement = this.toDomElement( domDocument );
-
-					mathliveConfig.renderMathTex?.( equation, domElement );
-
-					return domElement;
+			const mathFieldWrapper = writer.createContainerElement(
+				'span',
+				{
+					class: 'ck-math-field'
 				}
 			);
 
-			writer.insert( writer.createPositionAt( mathtexView, 0 ), uiElement );
+			const mathField = writer.createContainerElement(
+				'math-field',
+				{
+					'read-only': ''
+				}
+			);
+
+			writer.insert(
+				writer.createPositionAt( mathField, 0 ),
+				writer.createText( equation )
+			);
+
+			writer.insert(
+				writer.createPositionAt( mathFieldWrapper, 0 ),
+				mathField
+			);
+
+			writer.insert(
+				writer.createPositionAt( mathtexView, 0 ),
+				mathFieldWrapper
+			);
 
 			return mathtexView;
 		}
@@ -182,25 +194,20 @@ export default class MathliveEditing extends Plugin {
 				* Couldn't find equation on current element
 				* @error missing-equation
 				*/
-				throw new CKEditorError( 'missing-equation', { pluginName: 'math' } );
+				throw new CKEditorError( 'missing-equation', { pluginName: 'mathlive' } );
 			}
 
-			const { className, engine, mathFieldStyle } = mathliveConfig;
-			const mathFieldInlineStyle = mathFieldStyle ? styleObjectToCssString( mathFieldStyle ) : '';
-			const mathtexView = writer.createContainerElement( 'span', {
-				class: className,
-				engine,
-				...( engine === 'mathlive' && mathFieldInlineStyle ? {
-					'math-field-style': mathFieldInlineStyle
-				} : {} )
-			} );
+			const { output } = mathliveConfig;
+			if ( output ) {
+				const mathtexView = writer.createContainerElement( output.type, output.attributes );
 
-			writer.insert(
-				writer.createPositionAt( mathtexView, 0 ),
-				writer.createText( '\\(' + equation + '\\)' )
-			);
+				writer.insert(
+					writer.createPositionAt( mathtexView, 0 ),
+					writer.createText( '\\(' + equation + '\\)' )
+				);
 
-			return mathtexView;
+				return mathtexView;
+			}
 		}
 	}
 }

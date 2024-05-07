@@ -1,4 +1,7 @@
 import type { Mathlive } from './index';
+import type { DowncastWriter } from 'ckeditor5/src/engine';
+
+type ElementAttributes = Parameters<DowncastWriter['createContainerElement']>[1];
 
 declare module '@ckeditor/ckeditor5-core' {
 	interface PluginsMap {
@@ -8,23 +11,24 @@ declare module '@ckeditor/ckeditor5-core' {
 	interface EditorConfig {
 		mathlive?: {
 
-			/**  Customize your formula panel */
+			/**  Customize your formula panel. */
 			renderMathPanel?: ( element: HTMLElement ) => ( () => void ) | undefined;
 
-			/**  Customize rendering formulas by your engine */
-			renderMathTex?: ( equation: string, element: HTMLElement ) => void;
-
-			/**  Rendering formula engine, registered externally through your project */
-			engine?: 'mathlive' & string;
-
-			/**
-			 * math-field style passed when engine is mathlive,
-			 * see more: https://cortexjs.io/mathlive/guides/static/#read-only-mathfield
+			/**  A string used as a regular expression of class names of elements whose content will be scanned for delimiters.
+			 * e.g. <span class="tex2jax_process">\( \sqrt{\frac{a}{b}} \)</span>
 			 * */
-			mathFieldStyle?: Partial<CSSStyleDeclaration>;
+			processClass?: string;
+
+			/**  <script> tags with this type will be processed as LaTeX.
+			 * e.g. <script type="math/tex">\( \sqrt{\frac{a}{b}} \)</script>
+			 * */
+			processScriptType?: string;
 
 			/**  Output the className of html data (e.g. <span class="ck-mathlive-tex">\( \sqrt{\frac{a}{b}} \)</span>) */
-			className?: string;
+			output?: {
+				type: string;
+				attributes?: ElementAttributes;
+			};
 		};
 	}
 }

@@ -75,9 +75,3 @@ export function extractDelimiters( equation: string ): {
 		equation
 	};
 }
-
-export function styleObjectToCssString( style: Partial<CSSStyleDeclaration> ): string {
-	return Object.keys( style ).reduce( ( acc, key ) => (
-		acc + key.split( /(?=[A-Z])/ ).join( '-' ).toLowerCase() + ':' + ( style as { [key: string]: string } )[ key ] + ';'
-	), '' );
-}

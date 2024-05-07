@@ -20,3 +20,12 @@
 	left: 0;
 	right: 0;
 }
+
+/* stylelint-disable-next-line selector-type-no-unknown */
+.ck-math-field math-field {
+	display: inline-block;
+	padding: 0;
+	border: none;
+	color: inherit;
+	background: inherit;
+}
