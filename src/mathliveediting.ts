@@ -32,6 +32,7 @@ export default class MathliveEditing extends Plugin {
 					panelView = null;
 				};
 			},
+			openPanelWhenTexSelected: true,
 			processClass: 'tex2jax_process',
 			processScriptType: 'math/tex',
 			output: {

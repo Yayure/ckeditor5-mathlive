@@ -17,6 +17,11 @@ declare module '@ckeditor/ckeditor5-core' {
 			renderMathPanel?: ( element: HTMLElement ) => ( () => void ) | undefined;
 
 			/**
+			 * Whether to open the panel when a formula is selected.
+			 */
+			openPanelWhenTexSelected?: boolean;
+
+			/**
 			 * A string used as a regular expression of class names of elements whose content will be scanned for delimiters.
 			 * e.g. <span class="tex2jax_process">\( \sqrt{\frac{a}{b}} \)</span>
 			 */

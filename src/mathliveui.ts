@@ -1,5 +1,7 @@
 import '../theme/mathlive.css';
 import mathliveIcon from '../theme/icons/mathlive.svg';
+import MathliveEditing from './mathliveediting';
+import { ClickObserver } from 'ckeditor5/src/engine';
 import { ButtonView } from 'ckeditor5/src/ui';
 import { Plugin } from 'ckeditor5/src/core';
 import { CKEditorError, global } from 'ckeditor5/src/utils';
@@ -15,16 +17,28 @@ interface pluginScopeType {
 }
 
 export default class MathliveUI extends Plugin {
-	public mathPanelRoot: ( HTMLElement & pluginScopeType ) | null = null;
-	public mathPanelRootUnmount: ( () => void ) | undefined = undefined;
+	public static get requires() {
+		return [ MathliveEditing ] as const;
+	}
 
 	public static get pluginName() {
 		return 'MathliveUI' as const;
 	}
 
+	public mathPanelRoot: ( HTMLElement & pluginScopeType ) | null = null;
+	public mathPanelRootUnmount: ( () => void ) | undefined = undefined;
+
 	public init(): void {
+		const editor = this.editor;
+		editor.editing.view.addObserver( ClickObserver );
+
 		this._createToolbarMathButton();
+
 		this._createMathPanelRoot();
+
+		this._enableUserPopupsInteractions();
+
+		this._listenEditorEvents();
 	}
 
 	public _showUI(): void {
@@ -35,6 +49,16 @@ export default class MathliveUI extends Plugin {
 		const panelCommand = this.mathPanelRoot[ pluginScopeName ].panelCommand;
 
 		panelCommand.execute( this.mathPanelRoot );
+	}
+
+	public _hideUI(): void {
+		if ( !this.mathPanelRoot ) {
+			return;
+		}
+
+		const panelCommand = this.mathPanelRoot[ pluginScopeName ].panelCommand;
+
+		panelCommand.fire( 'close' );
 	}
 
 	private _createToolbarMathButton() {
@@ -87,5 +111,25 @@ export default class MathliveUI extends Plugin {
 		};
 
 		this.mathPanelRoot = panelRoot;
+	}
+
+	private _enableUserPopupsInteractions() {
+		const editor = this.editor;
+		const mathliveConfig = editor.config.get( 'mathlive' )!;
+		const viewDocument = editor.editing.view.document;
+		this.listenTo( viewDocument, 'click', () => {
+			const mathliveCommand = editor.commands.get( 'mathlive' );
+			if ( mathliveConfig.openPanelWhenTexSelected && mathliveCommand?.isEnabled && mathliveCommand.value ) {
+				this._showUI();
+			}
+		} );
+	}
+
+	private _listenEditorEvents() {
+		const editor = this.editor;
+
+		editor.on( 'destroy', () => {
+			this._hideUI();
+		} );
 	}
 }

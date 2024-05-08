@@ -15,13 +15,18 @@ export default class MathliveCommand extends Command {
 	public override refresh(): void {
 		const model = this.editor.model;
 		const selection = model.document.selection;
-
 		const selectedEquation = getSelectedMathModelWidget( selection );
+
+		this.isEnabled = true;
+
 		const value = selectedEquation?.getAttribute( 'equation' );
 		this.value = typeof value === 'string' ? value : undefined;
 	}
 }
 
+/**
+ * MathlivePanelCommand used to communicate and interact with the panel ui.
+ */
 export class MathlivePanelCommand extends Command {
 	public override value: string | undefined = undefined;
 	public declare isOpen: boolean;
@@ -41,8 +46,10 @@ export class MathlivePanelCommand extends Command {
 		this.value = mathliveCommand?.value;
 
 		if ( this.isOpen ) {
+			// The panel has been mounted, and the panel is notified to update the value.
 			this.fire( 'reopen', this.value );
 		} else {
+			// Mount panel.
 			global.document.body.appendChild( mathPanelRoot );
 
 			mathPanelRootUnmount = mathliveConfig.renderMathPanel?.( mathPanelRoot );
@@ -57,11 +64,13 @@ export class MathlivePanelCommand extends Command {
 				editor.editing.view.focus();
 			};
 
+			// The panel has been mounted, and the listening panel inserts the formula.
 			this.on( 'insert', ( eventInfo, equation = '' ) => {
 				inesertEquationModal( editor, equation );
 				onClose();
 			} );
 
+			// The panel has been mounted, monitoring the closing event operation.
 			this.on( 'close', onClose );
 		}
 	}
