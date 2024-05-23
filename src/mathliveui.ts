@@ -128,6 +128,12 @@ export default class MathliveUI extends Plugin {
 	private _listenEditorEvents() {
 		const editor = this.editor;
 
+		editor.on( 'change:isReadOnly', ( evt, propertyName, isReadOnly ) => {
+			if ( isReadOnly ) {
+				this._hideUI();
+			}
+		} );
+
 		editor.on( 'destroy', () => {
 			this._hideUI();
 		} );

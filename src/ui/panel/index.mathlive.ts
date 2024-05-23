@@ -4,7 +4,7 @@
 
 import type { MathfieldElement } from 'mathlive';
 import './index.mathlive.css';
-import { close } from './icons.base64';
+import latexMarkupMap from './icons/latexMarkupMap';
 
 declare function CommandEventOn( event: 'reopen', callback: ( _: unknown, equation: string ) => void ): void;
 
@@ -40,12 +40,6 @@ export default class PanelView {
 		// Add interaction to the math-field element.
 		const mathField = container.querySelector( '.ck-mathlive-panel-input math-field' ) as MathfieldElement;
 
-		// mathField.macros = {
-		// 	...mathField.macros,
-		// 	nicefrac: {
-		// 		captureSelection: false,
-		// 	},
-		// }
 		mathField?.addEventListener( 'input', e => {
 			this.equation = ( e.target as { value?: string } )?.value || '';
 		} );
@@ -77,17 +71,16 @@ export default class PanelView {
 
 		// Add FormulaView.
 		const formulaContainer = container.querySelector( '.ck-mathlive-panel-formula' ) as HTMLDivElement;
-		const formulaView = new FormulaView();
-		formulaView.mount( formulaContainer, {
-			onMathTexClick: ( equation, force ) => {
-				if ( force ) {
-					// panelCommand.fire( 'insert', equation );
-				} else {
-					mathField.executeCommand( [ 'insert', equation ] );
-					// panelCommand.fire( 'insert', equation );
-				}
+		const formulaView = new FormulaView( {
+			onMathTexClick: ( equation, { before, after } = {} ) => {
+				const beforeInterceptorState = before?.( mathField );
+
+				mathField.executeCommand( [ 'insert', equation ] );
+
+				after?.( mathField, beforeInterceptorState );
 			}
 		} );
+		formulaView.mount( formulaContainer );
 
 		hookContainer?.appendChild( container );
 
@@ -104,9 +97,7 @@ export default class PanelView {
 			<div class="ck-mathlive-panel-header">
 				<div class="ck-mathlive-panel-header-label ck-mathlive-panel-handle">公式</div>
 				<div class="ck-mathlive-panel-header-actions">
-					<div class="ck-mathlive-panel-header-close">
-						<img src="${ close }"/>
-					</div>
+					<div class="ck-mathlive-panel-header-close"></div>
 				</div>
 			</div>
 			<div class="ck-mathlive-panel-content">
@@ -125,39 +116,211 @@ export default class PanelView {
 	}
 }
 
-// function getMacroDefinition(token, macros) {
-//     if (!token.startsWith("\\"))
-//       return null;
-//     const command = token.slice(1);
-//     return macros[command];
-//   }
-
 export class FormulaView {
-	public hookContainer: HTMLElement | null = null;
-	public listeners?: { onMathTexClick?: ( equation: string, force?: boolean ) => void } = undefined;
 	public unmount: () => void = () => {};
-	public activeTabKey = 'fraction';
+	public hookContainer: HTMLElement | null = null;
+	public props?: {
+		onMathTexClick?: (
+			equation: string,
+			interceptor?: {
+				before?: ( mathField: MathfieldElement ) => 'reject' | 'resolve';
+				after?: ( mathField: MathfieldElement, beforeInterceptorState?: 'reject' | 'resolve' ) => void;
+			}
+		) => void;
+	} = undefined;
+	public activeTabKey = 'SUPAndSUB-fraction-radical';
 	public formulaTabs = [ {
-		key: 'fraction',
-		icon: ''
-	}, '' ];
-	public formulaMap = {
-		fraction: [ '\\frac{#0}{#0}', '\\tfrac{#0}{#0}', '{#0}/{#0}', '{}^{#0}\\!\\!/\\!{}_{#0}',
-			'\\pdiff{y}{x}' ]
+		key: 'SUPAndSUB-fraction-radical',
+		latexIcons: [ 'e^x', '\\frac{x}{y}', '\\sqrt[n]{x}' ]
+	}, {
+		key: 'integral-largeOperator',
+		latexIcons: [ '\\int_{-x}^x\\nolimits', '\\sum_{i=0}^n\\displaylimits' ]
+	}, {
+		key: 'function-limitAndlogarithm',
+		latexIcons: [ '\\sin{\\theta}', ' \\lim_{n\\rightarrow\\infty}' ]
+	}, {
+		key: 'matrix',
+		latexIcons: [ '\\(\\begin{bmatrix}1 & 0\\\\0 & 1\\end{bmatrix}\\)' ]
+	}, {
+		key: 'bracket',
+		latexIcons: [ '\\lbrace\\lparen\\rparen\\rbrace' ]
+	}, {
+		key: 'labelSymbol-operator',
+		latexIcons: [ '\\ddot{a}', '≜' ]
+	}, {
+		key: 'specificSymbol',
+		latexIcons: [ '\\Omega' ]
+	}
+	// , {
+	// 	key: 'chemistry',
+	// 	latexIcons: [ '\\ce{H2O}' ]
+	// }
+	];
+	public formulaMap: { [key: string]: Array<Array<string>> } = {
+		'SUPAndSUB-fraction-radical': [
+			[
+				'#0^#0', '#0_#0', '#0_#0^#0', '{_#0^#0}{#0}', 'x_{y^2}', 'e^{-i\\omega t}', 'x^2', '{_1^n}Y',
+				'a^2+b^2=c^2'
+			],
+			[
+				'\\frac{#0}{#0}', '\\tfrac{#0}{#0}', '#0/#0', '\\frac{\\pi}{2}', '\\frac{dy}{dx}', '\\frac{\\Delta y}{\\Delta x}',
+				'\\frac{\\partial y}{\\partial x}', '\\frac{\\delta y}{\\delta x}', '\\frac{1}{x^2 + 1}'
+			],
+			[
+				'\\sqrt{#0}', '\\sqrt[#0]{#0}', '\\sqrt[2]{#0}', '\\sqrt[3]{#0}', '\\sqrt{a^2+b^2}',
+				'\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}'
+			]
+		],
+		'integral-largeOperator': [
+			[
+				'\\int #0', '\\int_{#0}^{#0} #0', '\\int_{#0}^{#0}\\displaylimits #0', '\\iint #0', '\\iint_{#0}^{#0} #0',
+				'\\iint_{#0}^{#0}\\displaylimits #0', '\\iiint #0', '\\iiint_{#0}^{#0} #0', '\\iiint_{#0}^{#0}\\displaylimits #0',
+				'\\oint #0', '\\oint_{#0}^{#0} #0', '\\oint_{#0}^{#0}\\displaylimits #0', '\\oiint #0', '\\oiint_{#0}^{#0} #0',
+				'\\oiint_{#0}^{#0}\\displaylimits #0', '\\oiiint #0', '\\oiiint_{#0}^{#0} #0',
+				'\\oiiint_{#0}^{#0}\\displaylimits #0'
+			],
+			[
+				'\\sum #0', '\\sum_{#0}^{#0} #0', '\\sum_{#0}^{#0}\\nolimits #0', '\\sum_{#0} #0', '\\sum_{#0}\\nolimits #0',
+				'\\prod #0', '\\prod_{#0}^{#0} #0', '\\prod_{#0}^{#0}\\nolimits #0', '\\prod_{#0} #0', '\\prod_{#0}\\nolimits #0',
+				'\\coprod #0', '\\coprod_{#0}^{#0} #0', '\\coprod_{#0}^{#0}\\nolimits #0', '\\coprod_{#0} #0',
+				'\\coprod_{#0}\\nolimits #0', '\\bigcup #0', '\\bigcup_{#0}^{#0} #0', '\\bigcup_{#0}^{#0}\\nolimits #0',
+				'\\bigcup_{#0} #0', '\\bigcup_{#0}\\nolimits #0', '\\bigcap #0', '\\bigcap_{#0}^{#0} #0',
+				'\\bigcap_{#0}^{#0}\\nolimits #0', '\\bigcap_{#0} #0', '\\bigcap_{#0}\\nolimits #0', '\\bigvee #0',
+				'\\bigvee_{#0}^{#0} #0', '\\bigvee_{#0}^{#0}\\nolimits #0', '\\bigvee_{#0} #0', '\\bigvee_{#0}\\nolimits #0',
+				'\\bigwedge #0', '\\bigwedge_{#0}^{#0} #0', '\\bigwedge_{#0}^{#0}\\nolimits #0', '\\bigwedge_{#0} #0',
+				'\\bigwedge_{#0}\\nolimits #0', '\\sum_{k}\\binom{n}{k}', '\\sum_{i=0}^{n} #0',
+				'\\sum_{0\\le i \\le m \\atop 0 < j < n}P\\left(i,j\\right)', '\\prod_{k=1}^{n}A_k',
+				'\\bigcup_{n=1}^{m}\\left(X_n\\cap Y_n\\right)'
+			]
+		],
+		'function-limitAndlogarithm': [
+			[
+				'\\sin{#0}', '\\cos{#0}', '\\tan{#0}', '\\csc{#0}', '\\sec{#0}', '\\cot{#0}', '\\sin^{-1}{#0}', '\\cos^{-1}{#0}',
+				'\\tan^{-1}{#0}', '\\csc^{-1}{#0}', '\\sec^{-1}{#0}', '\\cot^{-1}{#0}', '\\sinh{#0}', '\\cosh{#0}', '\\tanh{#0}',
+				'\\coth{#0}', '\\sinh^{-1}{#0}', '\\cosh^{-1}{#0}', '\\tanh^{-1}{#0}', '\\coth^{-1}{#0}', '\\sin{\\theta}',
+				'\\cos{2x}', '\\tan{\\theta}=\\frac{\\sin{\\theta}}{\\cos{\\theta}}'
+			],
+			[
+				'\\log_#0{#0}', '\\log{#0}', '\\lim_{#0}{#0}', '\\min_{#0}{#0}', '\\max_{#0}{#0}', '\\ln{#0}',
+				'\\lim_{n\\rightarrow\\infty}{\\left(1+\\frac{1}{n}\\right)^n}', '\\max_{0\\le x\\le 1}{xe^{-x^2}}'
+			]
+		],
+		'matrix': [
+			[
+				'\\begin{matrix} #0 & #0 \\\\ \\end{matrix}', '\\begin{matrix} #0 \\\\ #0 \\\\ \\end{matrix}',
+				'\\begin{matrix} #0 & #0 & #0 \\\\ \\end{matrix}', '\\begin{matrix} #0 \\\\ #0 \\\\ #0 \\\\ \\end{matrix}',
+				'\\begin{matrix} #0 & #0 \\\\ #0 & #0 \\\\ \\end{matrix}',
+				'\\begin{matrix} #0 & #0 & #0 \\\\ #0 & #0 & #0 \\\\ \\end{matrix}',
+				'\\begin{matrix} #0 & #0 \\\\ #0 & #0 \\\\ #0 & #0 \\\\ \\end{matrix}',
+				'\\begin{matrix} #0 & #0 & #0 \\\\ #0 & #0 & #0 \\\\ #0 & #0 & #0 \\\\ \\end{matrix}',
+				'\\cdots', '\\ldots', '\\vdots', '\\ddots', '\\begin{matrix} 1 & 0 \\\\ 0 & 1 \\\\ \\end{matrix}',
+				'\\begin{matrix} 1 & #0 \\\\ #0 & 1 \\\\ \\end{matrix}',
+				'\\begin{matrix} 1 & 0 & 0 \\\\ 0 & 1 & 0 \\\\ 0 & 0 & 1 \\\\ \\end{matrix}',
+				'\\begin{matrix} 1 & #0 & #0 \\\\ #0 & 1 & #0 \\\\ #0 & #0 & 1 \\\\ \\end{matrix}',
+				'\\left(\\begin{matrix} #0 & #0 \\\\ #0 & #0 \\\\ \\end{matrix}\\right)',
+				'\\left[\\begin{matrix} #0 & #0 \\\\ #0 & #0 \\\\ \\end{matrix}\\right]',
+				'\\left|\\begin{matrix} #0 & #0 \\\\ #0 & #0 \\\\ \\end{matrix}\\right|',
+				'\\left\\Vert \\begin{matrix} #0 & #0 \\\\ #0 & #0 \\\\ \\end{matrix} \\right\\Vert',
+				// eslint-disable-next-line max-len
+				'\\left(\\begin{matrix} #0 & \\cdots & #0 \\\\ \\vdots & \\ddots & \\vdots \\\\ #0 & \\cdots & #0 \\\\ \\end{matrix}\\right)',
+				// eslint-disable-next-line max-len
+				'\\left[\\begin{matrix} #0 & \\cdots & #0 \\\\ \\vdots & \\ddots & \\vdots \\\\ #0 & \\cdots & #0 \\\\ \\end{matrix}\\right]'
+			]
+		],
+		'bracket': [
+			[
+				'\\left( #0\\right)', '\\left[ #0\\right]', '\\left\\{ #0\\right\\}', '\\langle #0\\rangle',
+				'\\left\\lfloor #0\\right\\rfloor', '\\left\\lceil #0\\right\\rceil', '\\left| #0\\right|', '\\left\\Vert #0\\right\\Vert',
+				'\\left[ #0\\right[', '\\left] #0\\right]', '\\left] #0\\right[', '〚 #0〛', '\\left( #0\\middle| #0\\right)',
+				'\\left\\{ #0\\middle| #0\\right\\}', '\\left\\langle #0\\middle| #0\\right\\rangle',
+				'\\left\\langle #0\\middle| #0\\middle| #0\\right\\rangle', '\\left( #0\\right.', '\\left. #0\\right)',
+				'\\left[ #0\\right.', '\\left. #0\\right]', '\\left\\{ #0\\right.', '\\left. #0\\right\\}',
+				'\\left\\langle #0\\right.', '\\left. #0\\rangle\\right', '\\left\\lfloor #0\\right.', '\\left. #0\\right\\rfloor',
+				'\\left\\lceil #0\\right.', '\\left. #0\\right\\rceil', '\\left| #0\\right.', '\\left. #0\\right|',
+				'\\left\\Vert #0\\right.', '\\left. #0\\right\\Vert', '〚 #0', ' #0〛', '\\left\\{{{#0}\\atop{#0}}\\right.',
+				'\\begin{cases}#0\\\\#0\\\\#0\\end{cases}', '#0 \\atop #0', '#0 \\choose #0', 'n \\choose k',
+				'\\left\\langle{n\\atop k}\\right\\rangle', 'f\\left(x\\right)=\\left\\{{{-x,x<0}\\atop{\\enspace x,x\\geq0}}\\right.'
+			]
+		],
+		'labelSymbol-operator': [
+			[
+				'\\dot{#0}', '\\ddot{#0}', '\\mathring{#0}', '\\hat{#0}', '\\check{#0}', '\\acute{#0}', '\\grave{#0}', '\\breve{#0}',
+				'\\widetilde{#0}', '\\bar{#0}', '\\bar{\\bar{#0}}', '\\vec{#0}', '\\overbrace{#0}', '\\underbrace{#0}', '\\boxed{#0}',
+				'\\boxed{a^2+b^2=c^2}', '\\overline{#0}', '\\overline{#0}', '\\underline{#0}', '\\overline{A}', '\\overline{ABC}',
+				'\\overline{x\\oplus y}'
+			],
+			[
+				'{\\colon=}', '{==}', '{+=}', '{-=}', '\\measeq', '\\eqdef', '≜', '\\overleftarrow{#0}', '\\overrightarrow{#0}',
+				'\\underleftarrow{#0}', '\\underrightarrow{#0}', '\\overleftrightarrow{#0}', '\\underleftrightarrow{#0}',
+				'\\Overrightarrow{#0}', '\\overleftharpoon{#0}', '\\overrightharpoon{#0}', '\\overlinesegment{#0}',
+				'\\underlinesegment{#0}', '\\overgroup{#0}', '\\underrightarrow{yields}', '\\underrightarrow{∆}'
+			]
+		],
+		'specificSymbol': [
+			[
+				'\\pm', '\\infty', '=', '\\neq', '\\thicksim', '\\times', '\\div', '!', '\\propto', '<', '\\ll', '>', '\\gg', '\\le',
+				'\\geq', '\\mp', '\\cong', '\\approx', '\\equiv', '\\forall', '\\complement', '\\partial', '\\sqrt', '\\cup', '\\cap',
+				'\\emptyset', '\\%', '°', '°F', '°C', '∆', '\\nabla', '\\exists', '\\nexists', '\\in', '\\ni', '\\gets', '\\uparrow',
+				'\\rightarrow', '\\downarrow', '\\leftrightarrow', '\\therefore', '+', '-', '\\lnot', '\\alpha', '\\beta', '\\gamma',
+				'\\delta', '\\varepsilon', '\\epsilon', '\\theta', '\\vartheta', '\\mu', '\\pi', '\\rho', '\\sigma', '\\tau',
+				'\\varphi', '\\omega', '\\ast', '\\bullet', '\\vdots', '\\cdots', '⋰', '\\ddots', '\\aleph', '\\beth', '\\blacksquare'
+			]
+		]
+		// 'chemistry': [
+		// 	[
+		// 		'\\ce{#0}', '\\ce{H2O}', '^{227}_{90}Th+', '$K = \\ce{\\frac{[Hg^2+][Hg]}{[Hg2^2+]}}$'
+		// 	]
+		// ]
 	};
+	public insertInterceptors = [
+		{
+			equations: [ '\\dot{#0}', '\\ddot{#0}', '\\mathring{#0}', '\\hat{#0}', '\\check{#0}', '\\acute{#0}', '\\grave{#0}',
+				'\\breve{#0}', '\\widetilde{#0}', '\\bar{#0}', '\\bar{\\bar{#0}}', '\\vec{#0}' ],
+			before: ( mathField: MathfieldElement ): 'reject' | 'resolve' => {
+				if ( !mathField.selectionIsCollapsed ) {
+					return 'reject';
+				}
 
-	public mount( hookContainer: FormulaView['hookContainer'], listeners?: FormulaView['listeners'] ): void {
+				mathField.executeCommand( 'extendSelectionBackward' );
+
+				return 'resolve';
+			},
+			after: ( mathField: MathfieldElement, beforeInterceptorState?: 'reject' | 'resolve' ): void => {
+				if ( !mathField.selectionIsCollapsed || beforeInterceptorState === 'reject' ) {
+					return;
+				}
+
+				mathField.executeCommand( 'extendSelectionBackward' );
+			}
+		}
+	];
+
+	constructor( props?: FormulaView['props'] ) {
+		this.props = props;
+	}
+
+	public mount( hookContainer: FormulaView['hookContainer'] ): void {
 		this.hookContainer = hookContainer;
-		this.listeners = listeners;
 
+		const props = this.props;
 		const container = this.render();
 
-		const texElements = container.querySelectorAll( '.ck-mathlive-formula-tex' );
+		const tabElements = container.querySelectorAll( '.ck-mathlive-formula-tab' );
+		tabElements.forEach( element => {
+			element.addEventListener( 'click', e => {
+				const key = ( e.target as HTMLDivElement )?.getAttribute( 'key' ) || '';
+				this.activeTabKey = key;
+				this.remount();
+			} );
+		} );
 
+		const texElements = container.querySelectorAll( '.ck-mathlive-formula-tex' );
+		const insertInterceptors = this.insertInterceptors;
 		texElements.forEach( element => {
 			element.addEventListener( 'click', e => {
 				const equation = ( e.target as HTMLDivElement )?.getAttribute( 'equation' ) || '';
-				listeners?.onMathTexClick?.( equation );
+				const { before, after } = insertInterceptors.find( ( { equations } ) => equations.indexOf( equation ) > -1 ) || {};
+				props?.onMathTexClick?.( equation, { before, after } );
 			} );
 		} );
 
@@ -177,23 +340,28 @@ export class FormulaView {
 	public render(): HTMLElement {
 		const container = document.createElement( 'div' );
 		container.className = 'ck-mathlive-formula';
+		const formulaTabs = this.formulaTabs;
+		const activeTabKey = this.activeTabKey;
+		const formulaRows = this.formulaMap[ activeTabKey ];
+
 		const html = `
-			<div class="ck-mathlive-formula-tabs">
-				<div class="ck-mathlive-formula-tab active">
-					111
-				</div>
-				<div class="ck-mathlive-formula-tab">
-					2222
-				</div>
+			<div class="ck-mathlive-formula-toolbar">
+				${ formulaTabs.map( ( { key, latexIcons } ) => `<div
+				class="ck-mathlive-formula-tab ${ key } ${ activeTabKey === key ? 'active' : '' }" key="${ key }">
+					${ latexIcons.map( equation => `<div class="ck-mathlive-latex-markup">
+						${ ( latexMarkupMap as { [key: string]: string } )[ equation ] }
+					</div>` ).join( '' ) }
+				</div>` ).join( '' ) }
 			</div>
 			<div class="ck-mathlive-formula-content">
-				<div class="ck-mathlive-formula-list">
-					${ this.formulaMap.fraction.map( equation => `<div class="ck-mathlive-formula-tex" equation="${ equation }">
-						<math-field read-only>${ equation }</math-field>
+				${ formulaRows.map( equations => `<div class="ck-mathlive-formula-row">
+					${ equations.map( equation => `<div class="ck-mathlive-formula-tex ${ activeTabKey }" equation="${ equation }">
+						<div class="ck-mathlive-latex-markup">${ ( latexMarkupMap as { [key: string]: string } )[ equation ] }</div>
 					</div>` ).join( '' ) }
-				</div>
+				</div>` ).join( '' ) }
 			</div>
 		`;
+
 		container.innerHTML = html.trim();
 		return container;
 	}
