@@ -18,8 +18,8 @@
 	right: 16px;
 	width: 540px;
 	height: fit-content;
-	background: #f5f5f5;
-	box-shadow: 0 0 2px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 0, 0, 0.2);
+	background-color: #f5f5f5;
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
 	border-radius: 4px;
 }
 
@@ -28,7 +28,7 @@
 	display: flex;
 	gap: 16px;
 	align-items: center;
-	background: #a0a9b8;
+	background-color: #a0a9b8;
 	border: 1px solid transparent;
 	border-top-left-radius: 4px;
 	border-top-right-radius: 4px;
@@ -38,7 +38,7 @@
 	padding-left: 8px;
 	flex: 1;
 	height: 100%;
-	color: #fff;
+	color: #ffffff;
 	display: flex;
 	align-items: center;
 	gap: 10px;
@@ -69,7 +69,7 @@
 	content: '';
 	height: 18px;
 	width: 2px;
-	background-color: #fff;
+	background-color: #ffffff;
 }
 .ck-mathlive-panel-header-close::before {
   transform: rotate(45deg);
@@ -85,7 +85,7 @@
 }
 
 .ck-mathlive-panel-formula {
-	background: #cacfd747;
+	background-color: #cacfd747;
 	border-radius: 4px;
 	padding: 0 6px 8px 6px;
 }
@@ -112,7 +112,7 @@
 	padding: 0 24px;
 	display: flex;
 	align-items: center;
-	background: #a0a9b8;
+	background-color: #a0a9b8;
 	color: rgb(255, 255, 255);
     border: none;
     font-size: 14px;
@@ -121,7 +121,7 @@
 }
 
 .ck-mathlive-panel-submit button:hover {
-	background: #7d8795;
+	background-color: #7d8795;
 }
 
 .ck-mathlive-formula {
@@ -228,7 +228,7 @@
 	display: flex;
 	align-items: center;
     justify-content: center;
-	background: #fff;
+	background-color: #ffffff;
 	padding: 0 6px;
 	height: 38px;
 	font-size: 14px;
@@ -247,12 +247,12 @@
 }
 
 .ck-mathlive-formula-tex:hover {
-	background: #f5f5f7;
+	background-color: #f5f5f7;
 }
 
 .ck-mathlive-formula-tex:active {
-	background: #0c75d8;
-	color: #fff;
+	background-color: #0c75d8;
+	color: #ffffff;
 }
 
 
@@ -295,7 +295,7 @@
     left: 2px;
     right: 2px;
     bottom: 7px;
-	background: hsl(212,70%,85%);
+	background-color: hsl(212,70%,85%);
 }
 .ck-mathlive-formula-tex.labelSymbol-operator[equation='\\widetilde{#0}'] .ck-mathlive-latex-markup::after {
 	top: 10px !important;
@@ -305,4 +305,21 @@
 .ck-mathlive-formula-row:nth-child(2)
 .ck-mathlive-formula-tex.labelSymbol-operator {
 	font-size: 16px;
+}
+
+
+.ck-mathlive-formula-tex.chemistry:nth-child(1) .ck-mathlive-latex-markup::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    top: 13px;
+    left: 11px;
+    right: 11px;
+    bottom: 12px;
+    background-color: hsl(212, 70%, 85%);
+}
+
+.ck-mathlive-formula-tex.chemistry:nth-child(1) {
+	position: relative;
+	z-index: 1;
 }

@@ -80,7 +80,7 @@
     "translations:collect": "ckeditor5-package-tools translations:collect",
     "translations:download": "ckeditor5-package-tools translations:download",
     "translations:upload": "ckeditor5-package-tools translations:upload",
-    "generateLatexMarkupMap": "npx vite-node src/ui/panel/icons/generateLatexMarkupMap.ts"
+    "generate:latexmarkupmap": "npx vite-node node_scripts/latextomarkup.ts"
   },
   "lint-staged": {
     "**/*.{js,ts}": [

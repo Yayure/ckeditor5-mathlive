@@ -8,7 +8,7 @@ import {
 import { extractDelimiters } from './utils';
 import type { DowncastWriter, Element, ViewElement, Writer } from 'ckeditor5/src/engine';
 import { CKEditorError } from 'ckeditor5/src/utils';
-import MathlivePanelView from './ui/panel/index.mathlive';
+import Panelview from './ui/panelview';
 
 export default class MathliveEditing extends Plugin {
 	public static get requires() {
@@ -23,7 +23,7 @@ export default class MathliveEditing extends Plugin {
 		super( editor );
 		editor.config.define( 'mathlive', {
 			renderMathPanel: element => {
-				let panelView: MathlivePanelView | null = new MathlivePanelView();
+				let panelView: Panelview | null = new Panelview();
 
 				panelView.mount( element );
 
@@ -195,6 +195,7 @@ export default class MathliveEditing extends Plugin {
 				* Couldn't find equation on current element
 				* @error missing-equation
 				*/
+				// eslint-disable-next-line ckeditor5-rules/ckeditor-error-message
 				throw new CKEditorError( 'missing-equation', { pluginName: 'mathlive' } );
 			}
 

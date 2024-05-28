@@ -1,6 +1,6 @@
 {
 	"extends": "stylelint-config-ckeditor5",
 	"ignoreFiles": [
-		"src/ui/panel/*.css"
+		"theme/panelview.css"
 	]
 }

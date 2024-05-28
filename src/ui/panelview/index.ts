@@ -2,9 +2,12 @@
  * Based on mathlive,see more: https://cortexjs.io/mathlive/
  */
 
-import type { MathfieldElement } from 'mathlive';
-import './index.mathlive.css';
-import latexMarkupMap from './icons/latexMarkupMap';
+import type { MathfieldElement as MathfieldElementType } from 'mathlive';
+import '../../../theme/panelview.css';
+
+declare global {
+	const MathfieldElement: MathfieldElementType | undefined;
+}
 
 declare function CommandEventOn( event: 'reopen', callback: ( _: unknown, equation: string ) => void ): void;
 
@@ -21,6 +24,10 @@ interface PanelCommand {
 const pluginScopeName = '_ckeditor5Mathlive';
 
 export default class PanelView {
+	constructor() {
+		this.setMathfieldElementConfig();
+	}
+
 	public equation = '';
 	public unmount: () => void = () => {};
 
@@ -38,7 +45,7 @@ export default class PanelView {
 		registerDragElement( container, handle );
 
 		// Add interaction to the math-field element.
-		const mathField = container.querySelector( '.ck-mathlive-panel-input math-field' ) as MathfieldElement;
+		const mathField = container.querySelector( '.ck-mathlive-panel-input math-field' ) as MathfieldElementType;
 
 		mathField?.addEventListener( 'input', e => {
 			this.equation = ( e.target as { value?: string } )?.value || '';
@@ -72,12 +79,20 @@ export default class PanelView {
 		// Add FormulaView.
 		const formulaContainer = container.querySelector( '.ck-mathlive-panel-formula' ) as HTMLDivElement;
 		const formulaView = new FormulaView( {
-			onMathTexClick: ( equation, { before, after } = {} ) => {
-				const beforeInterceptorState = before?.( mathField );
+			onMathTexClick: async ( equation, { before, after, customInsert } = {} ) => {
+				try {
+					await before?.( mathField );
 
-				mathField.executeCommand( [ 'insert', equation ] );
+					if ( customInsert ) {
+						customInsert?.( mathField );
+					} else {
+						mathField.executeCommand( [ 'insert', equation ] );
+					}
 
-				after?.( mathField, beforeInterceptorState );
+					after?.( mathField );
+				} catch ( error ) {
+					console.warn( error );
+				}
 			}
 		} );
 		formulaView.mount( formulaContainer );
@@ -85,6 +100,7 @@ export default class PanelView {
 		hookContainer?.appendChild( container );
 
 		this.unmount = () => {
+			formulaView.unmount();
 			panelCommand.off( 'reopen' );
 			hookContainer?.removeChild( container );
 		};
@@ -114,21 +130,33 @@ export default class PanelView {
 		container.innerHTML = html.trim();
 		return container;
 	}
+
+	public setMathfieldElementConfig(): void {
+		if ( typeof MathfieldElement !== 'undefined' ) {
+			// Disabled sounds of mathField.
+			MathfieldElement.soundsDirectory = null;
+		}
+	}
 }
 
 export class FormulaView {
+	constructor( props?: FormulaView['props'] ) {
+		this.props = props;
+	}
+
 	public unmount: () => void = () => {};
 	public hookContainer: HTMLElement | null = null;
 	public props?: {
 		onMathTexClick?: (
 			equation: string,
 			interceptor?: {
-				before?: ( mathField: MathfieldElement ) => 'reject' | 'resolve';
-				after?: ( mathField: MathfieldElement, beforeInterceptorState?: 'reject' | 'resolve' ) => void;
+				before?: ( mathField: MathfieldElementType ) => Promise<void>;
+				after?: ( mathField: MathfieldElementType ) => Promise<void>;
+				customInsert?: ( mathField: MathfieldElementType ) => void;
 			}
 		) => void;
 	} = undefined;
-	public activeTabKey = 'SUPAndSUB-fraction-radical';
+	public activeTabKey = 'chemistry';
 	public formulaTabs = [ {
 		key: 'SUPAndSUB-fraction-radical',
 		latexIcons: [ 'e^x', '\\frac{x}{y}', '\\sqrt[n]{x}' ]
@@ -150,12 +178,10 @@ export class FormulaView {
 	}, {
 		key: 'specificSymbol',
 		latexIcons: [ '\\Omega' ]
-	}
-	// , {
-	// 	key: 'chemistry',
-	// 	latexIcons: [ '\\ce{H2O}' ]
-	// }
-	];
+	}, {
+		key: 'chemistry',
+		latexIcons: [ '\\ce{H2O}' ]
+	} ];
 	public formulaMap: { [key: string]: Array<Array<string>> } = {
 		'SUPAndSUB-fraction-radical': [
 			[
@@ -250,7 +276,7 @@ export class FormulaView {
 				'\\overline{x\\oplus y}'
 			],
 			[
-				'{\\colon=}', '{==}', '{+=}', '{-=}', '\\measeq', '\\eqdef', '≜', '\\overleftarrow{#0}', '\\overrightarrow{#0}',
+				'\\colon=', '==', '+=', '-=', '\\measeq', '\\eqdef', '≜', '\\overleftarrow{#0}', '\\overrightarrow{#0}',
 				'\\underleftarrow{#0}', '\\underrightarrow{#0}', '\\overleftrightarrow{#0}', '\\underleftrightarrow{#0}',
 				'\\Overrightarrow{#0}', '\\overleftharpoon{#0}', '\\overrightharpoon{#0}', '\\overlinesegment{#0}',
 				'\\underlinesegment{#0}', '\\overgroup{#0}', '\\underrightarrow{yields}', '\\underrightarrow{∆}'
@@ -265,39 +291,63 @@ export class FormulaView {
 				'\\delta', '\\varepsilon', '\\epsilon', '\\theta', '\\vartheta', '\\mu', '\\pi', '\\rho', '\\sigma', '\\tau',
 				'\\varphi', '\\omega', '\\ast', '\\bullet', '\\vdots', '\\cdots', '⋰', '\\ddots', '\\aleph', '\\beth', '\\blacksquare'
 			]
+		],
+		'chemistry': [
+			[
+				'\\ce{#0}', '\\overset{#0}{#0}', '#0^{#0}', '#0_{#0}#0', '#0_{#0}#0_{#0}', '#0_{#0}^{#0}', '[#0_{#0}]^{#0}',
+				'#0^{#0}#0', '^{#0}_{#0}#0^{#0}', '#0 #0_{#0}#0', '\\tfrac{#0}{#0} #0_{#0}#0', '\\ #0 \\ = \\ #0 \\ + \\ #0',
+				'#0 \\ + \\ #0 \\ \\xlongequal[#0]{#0} \\ #0 \\ + \\ #0', '#0 \\ + \\ #0 \\ \\longrightarrow[#0]{#0} \\ #0 \\ + \\ #0',
+				'#0 \\ + \\ #0 \\ \\xtofrom[#0]{#0} \\ #0 \\ + \\ #0', '#0 \\ + \\ #0 \\ \\xrightleftharpoons[#0]{#0} \\ #0 \\ + \\ #0',
+				'\\overset{+4}{Mn}', 'H_{2}O', 'Sb_{2}O_{3}', 'Y^{99+}', '[AgCl_{2}]^{-}', 'CrO_{4}^{2-}', 'n H_{2}O',
+				'\\tfrac{1}{2} H_{2}O', 'H^{3}HO', '^{227}_{90}Th^{+}'
+			]
 		]
-		// 'chemistry': [
-		// 	[
-		// 		'\\ce{#0}', '\\ce{H2O}', '^{227}_{90}Th+', '$K = \\ce{\\frac{[Hg^2+][Hg]}{[Hg2^2+]}}$'
-		// 	]
-		// ]
 	};
-	public insertInterceptors = [
+
+	public insertInterceptors: Array<{
+		equations: Array<string>;
+		before?: ( mathField: MathfieldElementType ) => Promise<void>;
+		after?: ( mathField: MathfieldElementType ) => Promise<void>;
+		customInsert?: ( mathField: MathfieldElementType ) => void;
+	}> = [
 		{
 			equations: [ '\\dot{#0}', '\\ddot{#0}', '\\mathring{#0}', '\\hat{#0}', '\\check{#0}', '\\acute{#0}', '\\grave{#0}',
 				'\\breve{#0}', '\\widetilde{#0}', '\\bar{#0}', '\\bar{\\bar{#0}}', '\\vec{#0}' ],
-			before: ( mathField: MathfieldElement ): 'reject' | 'resolve' => {
-				if ( !mathField.selectionIsCollapsed ) {
-					return 'reject';
+			before: ( mathField: MathfieldElementType ): Promise<void> => {
+				if ( mathField.selectionIsCollapsed ) {
+					mathField.executeCommand( 'extendSelectionBackward' );
+
+					if ( !mathField.getValue( mathField.selection ) ) {
+						return Promise.reject( 'Please select content.' );
+					} else {
+						setTimeout( () => {
+							mathField.executeCommand( 'extendSelectionBackward' );
+						} );
+					}
 				}
 
-				mathField.executeCommand( 'extendSelectionBackward' );
+				return Promise.resolve();
+			}
+		},
+		{
+			equations: [ '\\ce{#0}' ],
+			before: ( mathField: MathfieldElementType ): Promise<void> => {
+				if ( mathField.selectionIsCollapsed ) {
+					mathField.executeCommand( 'extendToGroupStart' );
 
-				return 'resolve';
-			},
-			after: ( mathField: MathfieldElement, beforeInterceptorState?: 'reject' | 'resolve' ): void => {
-				if ( !mathField.selectionIsCollapsed || beforeInterceptorState === 'reject' ) {
-					return;
+					if ( !mathField.getValue( mathField.selection ) ) {
+						return Promise.reject( 'Please select content.' );
+					} else {
+						setTimeout( () => {
+							mathField.executeCommand( 'extendToGroupStart' );
+						} );
+					}
 				}
 
-				mathField.executeCommand( 'extendSelectionBackward' );
+				return Promise.resolve();
 			}
 		}
 	];
-
-	constructor( props?: FormulaView['props'] ) {
-		this.props = props;
-	}
 
 	public mount( hookContainer: FormulaView['hookContainer'] ): void {
 		this.hookContainer = hookContainer;
@@ -319,8 +369,9 @@ export class FormulaView {
 		texElements.forEach( element => {
 			element.addEventListener( 'click', e => {
 				const equation = ( e.target as HTMLDivElement )?.getAttribute( 'equation' ) || '';
-				const { before, after } = insertInterceptors.find( ( { equations } ) => equations.indexOf( equation ) > -1 ) || {};
-				props?.onMathTexClick?.( equation, { before, after } );
+				const { before, after, customInsert } = insertInterceptors
+					.find( ( { equations } ) => equations.indexOf( equation ) > -1 ) || {};
+				props?.onMathTexClick?.( equation, { before, after, customInsert } );
 			} );
 		} );
 
@@ -343,27 +394,107 @@ export class FormulaView {
 		const formulaTabs = this.formulaTabs;
 		const activeTabKey = this.activeTabKey;
 		const formulaRows = this.formulaMap[ activeTabKey ];
+		const latexIconMarkupMap = this.getLatexIconMarkupMap();
 
 		const html = `
 			<div class="ck-mathlive-formula-toolbar">
-				${ formulaTabs.map( ( { key, latexIcons } ) => `<div
+				${ latexIconMarkupMap ? formulaTabs.map( ( { key, latexIcons } ) => `<div
 				class="ck-mathlive-formula-tab ${ key } ${ activeTabKey === key ? 'active' : '' }" key="${ key }">
 					${ latexIcons.map( equation => `<div class="ck-mathlive-latex-markup">
-						${ ( latexMarkupMap as { [key: string]: string } )[ equation ] }
+						${ ( latexIconMarkupMap as { [key: string]: string } )[ equation ] }
 					</div>` ).join( '' ) }
-				</div>` ).join( '' ) }
+				</div>` ).join( '' ) : '' }
 			</div>
 			<div class="ck-mathlive-formula-content">
-				${ formulaRows.map( equations => `<div class="ck-mathlive-formula-row">
+				${ latexIconMarkupMap ? formulaRows.map( equations => `<div class="ck-mathlive-formula-row">
 					${ equations.map( equation => `<div class="ck-mathlive-formula-tex ${ activeTabKey }" equation="${ equation }">
-						<div class="ck-mathlive-latex-markup">${ ( latexMarkupMap as { [key: string]: string } )[ equation ] }</div>
+						<div class="ck-mathlive-latex-markup">${ ( latexIconMarkupMap as { [key: string]: string } )[ equation ] }</div>
 					</div>` ).join( '' ) }
-				</div>` ).join( '' ) }
+				</div>` ).join( '' ) : '' }
 			</div>
 		`;
-
 		container.innerHTML = html.trim();
 		return container;
+	}
+
+	public latexIconMarkupMap: { [key: string]: string } | undefined = undefined;
+
+	public getLatexIconMarkupMap(): FormulaView['latexIconMarkupMap'] {
+		if ( this.latexIconMarkupMap ) {
+			return this.latexIconMarkupMap;
+		}
+
+		const latexIconConvertInterceptorMap = this.latexIconConvertInterceptorMap;
+
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore:next-line
+		import( './latexmarkupmap' ).then( module => {
+			this.latexIconMarkupMap = Object.entries( module.default ).reduce( ( result, [ latex, markup ] ) => {
+				const { after: latexConvertAfter } = latexIconConvertInterceptorMap[ latex ] ||
+					latexIconConvertInterceptorMap._default || {};
+				if ( latexConvertAfter ) {
+					return {
+						...result,
+						[ latex ]: latexConvertAfter( markup )
+					};
+				}
+				return {
+					...result,
+					[ latex ]: markup
+				};
+			}, {} );
+
+			this.remount();
+		} );
+	}
+
+	public latexIconConvertInterceptorMap: {
+		[key: string]: {
+			before?: ( latex: string ) => string;
+			after?: ( markup: string ) => string;
+		};
+	} = {
+		'\\ce{#0}': {
+			before: () => {
+				return '\\boxed{\\ce{▢}}';
+			},
+			after: markup => {
+				return markup.replace( '▢', '&emsp;&emsp;&emsp;' );
+			}
+		},
+		_default: {
+			before: latex => {
+				return latex.replace( /#0/g, '▢' );
+			}
+		}
+	};
+
+	public getConvertToIconMarkupLatex(): Array<{
+		latex: string;
+		iconLatex: string;
+	}> {
+		const latexIconConvertInterceptorMap = this.latexIconConvertInterceptorMap;
+
+		const tabIconsLatex = this.formulaTabs.map( ( { latexIcons } ) => latexIcons ).flat();
+		const formulaIconsLatex = Array.from( Object.entries( this.formulaMap ) )
+			.map( ( [ _, value ] ) => value.flat() ).flat();
+
+		const latexIconLatex = [ ...tabIconsLatex, ...formulaIconsLatex ].map( latex => {
+			const { before: latexConvertBefore } = latexIconConvertInterceptorMap[ latex ] ||
+				latexIconConvertInterceptorMap._default || {};
+			if ( latexConvertBefore ) {
+				return {
+					latex,
+					iconLatex: latexConvertBefore( latex )
+				};
+			}
+			return {
+				latex,
+				iconLatex: latex
+			};
+		} );
+
+		return latexIconLatex;
 	}
 }
 
