@@ -8,13 +8,18 @@
     "ckeditor 5",
     "ckeditor5-feature",
     "ckeditor5-plugin",
-    "ckeditor5-dll",
-    "ckeditor5-package-generator",
     "ckeditor5-mathlive",
-    "mathlive"
+    "mathlive",
+    "math"
   ],
   "main": "src/index.ts",
+  "author": "Yayure",
   "license": "MIT",
+  "bugs": "https://github.com/Yayure/ckeditor5-mathlive/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Yayure/ckeditor5-mathlive.git"
+  },
   "engines": {
     "node": ">=16.0.0",
     "npm": ">=5.7.1"

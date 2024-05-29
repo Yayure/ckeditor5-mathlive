@@ -156,7 +156,7 @@ export class FormulaView {
 			}
 		) => void;
 	} = undefined;
-	public activeTabKey = 'chemistry';
+	public activeTabKey = 'SUPAndSUB-fraction-radical';
 	public formulaTabs = [ {
 		key: 'SUPAndSUB-fraction-radical',
 		latexIcons: [ 'e^x', '\\frac{x}{y}', '\\sqrt[n]{x}' ]
