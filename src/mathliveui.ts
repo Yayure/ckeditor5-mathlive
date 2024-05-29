@@ -69,6 +69,7 @@ export default class MathliveUI extends Plugin {
 			 * Mathlive command not found
 			 * @error plugin-load
 			 */
+			// eslint-disable-next-line ckeditor5-rules/ckeditor-error-message
 			throw new CKEditorError( 'plugin-load', { pluginName: 'mathlive' } );
 		}
 		const t = editor.t;

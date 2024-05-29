@@ -503,44 +503,39 @@ function registerDragElement( container: HTMLElement | null, handle: HTMLElement
 		return;
 	}
 
-	let pos1 = 0;
-	let pos2 = 0;
-	let pos3 = 0;
-	let pos4 = 0;
+	let startClientX = 0;
+	let startClientY = 0;
+	let offsetX = 0;
+	let offsetY = 0;
 
-	// Move the DIV from handle:
-	handle.onmousedown = dragMouseDown;
-
-	function dragMouseDown( e: MouseEvent ) {
-		e = e || window.event;
-		e.preventDefault();
-		// get the mouse cursor position at startup:
-		pos3 = e.clientX;
-		pos4 = e.clientY;
-		document.onmouseup = closeDragElement;
-		// call a function whenever the cursor moves:
-		document.onmousemove = elementDrag;
-	}
-
-	function elementDrag( e: MouseEvent ) {
-		e = e || window.event;
-		e.preventDefault();
-		// calculate the new cursor position:
-		pos1 = pos3 - e.clientX;
-		pos2 = pos4 - e.clientY;
-		pos3 = e.clientX;
-		pos4 = e.clientY;
+	const onHandleMousemove = ( e: MouseEvent ) => {
+		const movingClientX = e.clientX;
+		const movingClientY = e.clientY;
+		offsetX = movingClientX - startClientX;
+		offsetY = movingClientY - startClientY;
 
 		if ( container ) {
-			// set the element's new position:
-			container.style.top = ( container.offsetTop - pos2 ) + 'px';
-			container.style.left = ( container.offsetLeft - pos1 ) + 'px';
+			container.style.transform = `translate(${ offsetX }px, ${ offsetY }px)`;
 		}
-	}
+	};
 
-	function closeDragElement() {
-		// stop moving when mouse button is released:
-		document.onmouseup = null;
-		document.onmousemove = null;
-	}
+	const onHandleMouseup = () => {
+		const { right: containerStyleRight, bottom: containerStyleBottom } = window.getComputedStyle( container );
+		container.style.transform = '';
+		container.style.right = ( parseInt( containerStyleRight ) - offsetX ) + 'px';
+		container.style.bottom = ( parseInt( containerStyleBottom ) - offsetY ) + 'px';
+
+		document.removeEventListener( 'mouseup', onHandleMouseup );
+		document.removeEventListener( 'mousemove', onHandleMousemove );
+	};
+
+	const onHandleMousedown = ( e: MouseEvent ) => {
+		startClientX = e.clientX;
+		startClientY = e.clientY;
+
+		document.addEventListener( 'mouseup', onHandleMouseup );
+		document.addEventListener( 'mousemove', onHandleMousemove );
+	};
+
+	handle.addEventListener( 'mousedown', onHandleMousedown );
 }

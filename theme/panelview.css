@@ -45,7 +45,7 @@
 }
 
 .ck-mathlive-panel-handle {
-	cursor: move;
+	cursor: default;
 }
 
 .ck-mathlive-panel-header-actions {
