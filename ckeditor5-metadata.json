@@ -3,7 +3,7 @@
 		{
 			"name": "Mathlive",
 			"className": "Mathlive",
-			"description": "Adds text to the editor.",
+			"description": "Mathlive feature for CKEditor 5.",
 			"path": "src/mathlive.ts",
 			"uiComponents": [
 				{

@@ -1,7 +1,7 @@
 {
   "name": "@yayure/ckeditor5-mathlive",
   "version": "41.3.1",
-  "description": "A plugin for CKEditor 5.",
+  "description": "Mathlive feature for CKEditor 5.",
   "keywords": [
     "ckeditor",
     "ckeditor5",
@@ -30,7 +30,8 @@
     "src/**/*.d.ts",
     "theme",
     "build",
-    "ckeditor5-metadata.json"
+    "ckeditor5-metadata.json",
+    "CHANGELOG.md"
   ],
   "devDependencies": {
     "@ckeditor/ckeditor5-autoformat": ">=41.3.1",

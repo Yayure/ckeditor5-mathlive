@@ -122,6 +122,18 @@
 				CKEditor5.basicStyles.Code,
 				CKEditor5.upload.Base64UploadAdapter
 			],
+			mathlive: {
+				renderMathPanel: function( element ) {
+					let panelView = new CKEditor5[ 'mathlive' ].MathlivePanelview();
+
+					panelView.mount( element );
+
+					return () => {
+						panelView?.unmount();
+						panelView = null;
+					};
+				}
+			},
 			toolbar: [
 				'mathlive',
 				'|',

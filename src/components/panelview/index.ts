@@ -2,8 +2,10 @@
  * Based on mathlive,see more: https://cortexjs.io/mathlive/
  */
 
+import type { Editor } from 'ckeditor5/src/core';
 import type { MathfieldElement as MathfieldElementType } from 'mathlive';
 import '../../../theme/panelview.css';
+import latexIconMarkupMap from './latexmarkupmap';
 
 declare global {
 	const MathfieldElement: MathfieldElementType | undefined;
@@ -15,6 +17,7 @@ declare function CommandEventFire( event: 'insert', equation: string ): void;
 declare function CommandEventFire( event: 'close' ): void;
 
 interface PanelCommand {
+	editor: Editor;
 	value: string | undefined;
 	off: ( event: 'reopen' ) => void;
 	on: typeof CommandEventOn;
@@ -36,9 +39,11 @@ export default class PanelView {
 		const panelCommand = ( hookContainer as ( ( HTMLElement | null ) & { _ckeditor5Mathlive: { panelCommand: PanelCommand } } ) )
 			?.[ pluginScopeName ].panelCommand;
 
+		const translate = panelCommand.editor.t;
+
 		this.equation = panelCommand.value || '';
 
-		const container = this.render();
+		const container = this.render( translate );
 
 		// Register draggable panel.
 		const handle = container.querySelector( '.ck-mathlive-panel-handle' ) as HTMLDivElement;
@@ -106,12 +111,12 @@ export default class PanelView {
 		};
 	}
 
-	public render(): HTMLElement {
+	public render( translate: Editor['t'] ): HTMLElement {
 		const container = document.createElement( 'div' );
 		container.className = 'ck-mathlive-panel';
 		const html = `
 			<div class="ck-mathlive-panel-header">
-				<div class="ck-mathlive-panel-header-label ck-mathlive-panel-handle">公式</div>
+				<div class="ck-mathlive-panel-header-label ck-mathlive-panel-handle"></div>
 				<div class="ck-mathlive-panel-header-actions">
 					<div class="ck-mathlive-panel-header-close"></div>
 				</div>
@@ -122,8 +127,8 @@ export default class PanelView {
 					<math-field></math-field>
 				</div>
 				<div class="ck-mathlive-panel-submit">
-					<button class="ck-mathlive-panel-submit-confirm">插入</button>
-					<button class="ck-mathlive-panel-submit-cancel">取消</button>
+					<button class="ck-mathlive-panel-submit-confirm">${ translate( 'Insert' ) }</button>
+					<button class="ck-mathlive-panel-submit-cancel">${ translate( 'Cancel' ) }</button>
 				</div>
 			</div>
 		`;
@@ -426,26 +431,22 @@ export class FormulaView {
 
 		const latexIconConvertInterceptorMap = this.latexIconConvertInterceptorMap;
 
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore:next-line
-		import( './latexmarkupmap' ).then( module => {
-			this.latexIconMarkupMap = Object.entries( module.default ).reduce( ( result, [ latex, markup ] ) => {
-				const { after: latexConvertAfter } = latexIconConvertInterceptorMap[ latex ] ||
-					latexIconConvertInterceptorMap._default || {};
-				if ( latexConvertAfter ) {
-					return {
-						...result,
-						[ latex ]: latexConvertAfter( markup )
-					};
-				}
+		this.latexIconMarkupMap = Object.entries( latexIconMarkupMap ).reduce( ( result, [ latex, markup ] ) => {
+			const { after: latexConvertAfter } = latexIconConvertInterceptorMap[ latex ] ||
+				latexIconConvertInterceptorMap._default || {};
+			if ( latexConvertAfter ) {
 				return {
 					...result,
-					[ latex ]: markup
+					[ latex ]: latexConvertAfter( markup )
 				};
-			}, {} );
+			}
+			return {
+				...result,
+				[ latex ]: markup
+			};
+		}, {} );
 
-			this.remount();
-		} );
+		return this.latexIconMarkupMap;
 	}
 
 	public latexIconConvertInterceptorMap: {

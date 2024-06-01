@@ -23,7 +23,7 @@ import { Paragraph } from '@ckeditor/ckeditor5-paragraph';
 import { Table, TableToolbar } from '@ckeditor/ckeditor5-table';
 import { Base64UploadAdapter } from '@ckeditor/ckeditor5-upload';
 
-import Mathlive from '../src/mathlive';
+import { Mathlive, MathlivePanelview } from '../src/index';
 
 ClassicEditor
 	.create( document.getElementById( 'editor' )!, {
@@ -75,6 +75,18 @@ ClassicEditor
 			'undo',
 			'redo'
 		],
+		mathlive: {
+			renderMathPanel: element => {
+				let panelView: MathlivePanelview | null = new MathlivePanelview();
+
+				panelView.mount( element );
+
+				return () => {
+					panelView?.unmount();
+					panelView = null;
+				};
+			}
+		},
 		image: {
 			toolbar: [
 				'imageStyle:inline',

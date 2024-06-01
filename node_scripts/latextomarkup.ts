@@ -1,4 +1,4 @@
-import { FormulaView } from '../src/ui/panelview';
+import { FormulaView } from '../src/components/panelview';
 import { convertLatexToMarkup } from 'mathlive';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -10,11 +10,11 @@ const latexMarkupMap = formulaView.getConvertToIconMarkupLatex().reduce( ( resul
 	[ latex ]: convertLatexToMarkup( iconLatex )
 } ), {} );
 
-const filePath = path.resolve( __dirname, '../src/ui/panelview/latexmarkupmap.ts' );
+const filePath = path.resolve( __dirname, '../src/components/panelview/latexmarkupmap.ts' );
 
 writeFile( filePath, latexMarkupMap );
 
-async function writeFile( filename: any, writedata: any ) {
+async function writeFile( filename: string, writedata: { [ key: string ]: string } ) {
 	try {
 		await fs.promises.writeFile( filename, `export default ${
 			JSON.stringify( writedata, null, 4 )
