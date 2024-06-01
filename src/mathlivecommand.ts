@@ -30,48 +30,78 @@ export default class MathliveCommand extends Command {
 export class MathlivePanelCommand extends Command {
 	public override value: string | undefined = undefined;
 	public declare isOpen: boolean;
+	public declare isMounted: boolean;
+
+	public override destroy(): void {}
 
 	constructor( editor: Editor ) {
 		super( editor );
 
 		this.set( 'isOpen', false );
+		this.set( 'isMounted', false );
 	}
 
 	public override execute( mathPanelRoot: HTMLElement ): void {
 		const editor = this.editor;
 		const mathliveCommand = editor.commands.get( 'mathlive' ) as MathliveCommand;
 		const mathliveConfig = editor.config.get( 'mathlive' )!;
-		let mathPanelRootUnmount: ( () => void ) | undefined = undefined;
+		const body = global.document.body;
+
+		if ( !mathliveConfig.renderMathPanel ) {
+			console.warn( 'Please add the renderMathPanel configuration.' );
+			return;
+		}
 
 		this.value = mathliveCommand?.value;
 
-		if ( this.isOpen ) {
-			// The panel has been mounted, and the panel is notified to update the value.
-			this.fire( 'reopen', this.value );
-		} else {
+		const close = () => {
+			body.removeChild( mathPanelRoot );
+			this.isOpen = false;
+			editor.editing.view.focus();
+
+			if ( mathliveConfig.mathPanelDestroyOnClose ) {
+				this.destroy();
+				this.isMounted = false;
+			}
+		};
+
+		if ( !this.isMounted ) {
 			// Mount panel.
-			global.document.body.appendChild( mathPanelRoot );
-
-			mathPanelRootUnmount = mathliveConfig.renderMathPanel?.( mathPanelRoot );
-
-			this.isOpen = true;
-			this.stopListening();
-
-			const onClose = () => {
-				mathPanelRootUnmount?.();
-				global.document.body.removeChild( mathPanelRoot );
-				this.isOpen = false;
-				editor.editing.view.focus();
-			};
+			const mathPanelRootUnmount = mathliveConfig.renderMathPanel( mathPanelRoot );
 
 			// The panel has been mounted, and the listening panel inserts the formula.
 			this.on( 'insert', ( eventInfo, equation = '' ) => {
 				inesertEquationModal( editor, equation );
-				onClose();
+				close();
 			} );
 
 			// The panel has been mounted, monitoring the closing event operation.
-			this.on( 'close', onClose );
+			this.on( 'close', close );
+
+			// Register Destroy.
+			this.destroy = () => {
+				this.stopListening();
+				mathPanelRootUnmount?.();
+
+				if ( body.contains( mathPanelRoot ) ) {
+					body.removeChild( mathPanelRoot );
+				}
+			};
+
+			this.isMounted = true;
+			this.fire( 'mounted' );
+		}
+
+		if ( this.isOpen ) {
+			// The panel has been mounted, and the panel is notified to update the value.
+			this.fire( 'refocus', this.value );
+		} else {
+			// Open Panel.
+			global.document.body.appendChild( mathPanelRoot );
+
+			this.isOpen = true;
+
+			this.fire( 'reopen', this.value );
 		}
 	}
 }

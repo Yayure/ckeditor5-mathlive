@@ -22,6 +22,7 @@ import { MediaEmbed } from '@ckeditor/ckeditor5-media-embed';
 import { Paragraph } from '@ckeditor/ckeditor5-paragraph';
 import { Table, TableToolbar } from '@ckeditor/ckeditor5-table';
 import { Base64UploadAdapter } from '@ckeditor/ckeditor5-upload';
+import { Alignment } from '@ckeditor/ckeditor5-alignment';
 
 import { Mathlive, MathlivePanelview } from '../src/index';
 
@@ -49,7 +50,8 @@ ClassicEditor
 			TableToolbar,
 			CodeBlock,
 			Code,
-			Base64UploadAdapter
+			Base64UploadAdapter,
+			Alignment
 		],
 		toolbar: [
 			'mathlive',
@@ -60,6 +62,9 @@ ClassicEditor
 			'italic',
 			'link',
 			'code',
+			'|',
+			'alignment',
+			'|',
 			'bulletedList',
 			'numberedList',
 			'|',

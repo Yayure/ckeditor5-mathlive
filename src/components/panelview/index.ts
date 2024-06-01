@@ -11,7 +11,8 @@ declare global {
 	const MathfieldElement: MathfieldElementType | undefined;
 }
 
-declare function CommandEventOn( event: 'reopen', callback: ( _: unknown, equation: string ) => void ): void;
+declare function CommandEventOn( event: 'mounted', callback: () => void ): void;
+declare function CommandEventOn( event: 'refocus' | 'reopen', callback: ( _: unknown, equation: string ) => void ): void;
 
 declare function CommandEventFire( event: 'insert', equation: string ): void;
 declare function CommandEventFire( event: 'close' ): void;
@@ -19,7 +20,7 @@ declare function CommandEventFire( event: 'close' ): void;
 interface PanelCommand {
 	editor: Editor;
 	value: string | undefined;
-	off: ( event: 'reopen' ) => void;
+	off: ( event: 'mounted' | 'refocus' | 'reopen' ) => void;
 	on: typeof CommandEventOn;
 	fire: typeof CommandEventFire;
 }
@@ -34,10 +35,11 @@ export default class PanelView {
 	public equation = '';
 	public unmount: () => void = () => {};
 
-	public mount( hookContainer: HTMLElement | null ): void {
+	public mount( hookContainer: HTMLElement ): void {
 		// Get ckeditor5Mathlive panelCommand.
-		const panelCommand = ( hookContainer as ( ( HTMLElement | null ) & { _ckeditor5Mathlive: { panelCommand: PanelCommand } } ) )
-			?.[ pluginScopeName ].panelCommand;
+		const panelCommand = ( hookContainer as ( HTMLElement & { _ckeditor5Mathlive: { panelCommand: PanelCommand } } ) )[
+			pluginScopeName
+		].panelCommand;
 
 		const translate = panelCommand.editor.t;
 
@@ -57,11 +59,6 @@ export default class PanelView {
 		} );
 		mathField.setValue( this.equation );
 		setTimeout( () => {
-			panelCommand.on( 'reopen', ( _, equation = '' ) => {
-				this.equation = equation;
-				mathField.setValue( equation );
-				mathField.focus();
-			} );
 			mathField.focus();
 		} );
 
@@ -69,7 +66,6 @@ export default class PanelView {
 		const confirmButton = container.querySelector( '.ck-mathlive-panel-submit-confirm' ) as HTMLButtonElement;
 		confirmButton.addEventListener( 'click', () => {
 			panelCommand.fire( 'insert', this.equation );
-			// mathField.executeCommand(["insert", '\\xLeftrightarrow[\\quad111\\quad]{#0}']);
 		} );
 
 		// Add interaction to cancel.
@@ -104,8 +100,21 @@ export default class PanelView {
 
 		hookContainer?.appendChild( container );
 
+		panelCommand.on( 'refocus', ( _, equation = '' ) => {
+			this.equation = equation;
+			mathField.setValue( equation );
+			mathField.focus();
+		} );
+
+		panelCommand.on( 'reopen', ( _, equation = '' ) => {
+			this.equation = equation;
+			mathField.setValue( equation );
+			mathField.focus();
+		} );
+
 		this.unmount = () => {
 			formulaView.unmount();
+			panelCommand.off( 'refocus' );
 			panelCommand.off( 'reopen' );
 			hookContainer?.removeChild( container );
 		};
@@ -299,11 +308,11 @@ export class FormulaView {
 		],
 		'chemistry': [
 			[
-				'\\ce{#0}', '\\overset{#0}{#0}', '#0^{#0}', '#0_{#0}#0', '#0_{#0}#0_{#0}', '#0_{#0}^{#0}', '[#0_{#0}]^{#0}',
-				'#0^{#0}#0', '^{#0}_{#0}#0^{#0}', '#0 #0_{#0}#0', '\\tfrac{#0}{#0} #0_{#0}#0', '\\ #0 \\ = \\ #0 \\ + \\ #0',
+				'\\ce{#0}', '\\overset{#0}{#0}', '#0_{#0}', '#0^{#0}', '#0_{#0}^{#0}', '[#0_{#0}]^{#0}', '^{#0}_{#0}#0^{#0}', '#0_{#0}#0',
+				'#0^{#0}#0', '#0_{#0}#0_{#0}', '#0 #0_{#0}#0', '\\tfrac{#0}{#0} #0_{#0}#0', '\\ #0 \\ = \\ #0 \\ + \\ #0',
 				'#0 \\ + \\ #0 \\ \\xlongequal[#0]{#0} \\ #0 \\ + \\ #0', '#0 \\ + \\ #0 \\ \\longrightarrow[#0]{#0} \\ #0 \\ + \\ #0',
 				'#0 \\ + \\ #0 \\ \\xtofrom[#0]{#0} \\ #0 \\ + \\ #0', '#0 \\ + \\ #0 \\ \\xrightleftharpoons[#0]{#0} \\ #0 \\ + \\ #0',
-				'\\overset{+4}{Mn}', 'H_{2}O', 'Sb_{2}O_{3}', 'Y^{99+}', '[AgCl_{2}]^{-}', 'CrO_{4}^{2-}', 'n H_{2}O',
+				'\\overset{+4}{Mn}', 'MnO_{2}', 'H_{2}O', 'Sb_{2}O_{3}', 'Y^{99+}', '[AgCl_{2}]^{-}', 'CrO_{4}^{2-}', 'n H_{2}O',
 				'\\tfrac{1}{2} H_{2}O', 'H^{3}HO', '^{227}_{90}Th^{+}'
 			]
 		]
@@ -460,7 +469,7 @@ export class FormulaView {
 				return '\\boxed{\\ce{▢}}';
 			},
 			after: markup => {
-				return markup.replace( '▢', '&emsp;&emsp;&emsp;' );
+				return markup.replace( '▢', '&emsp;&emsp;&emsp;&emsp;' );
 			}
 		},
 		_default: {
@@ -499,11 +508,7 @@ export class FormulaView {
 	}
 }
 
-function registerDragElement( container: HTMLElement | null, handle: HTMLElement | null ): void {
-	if ( !container || !handle ) {
-		return;
-	}
-
+function registerDragElement( container: HTMLElement, handle: HTMLElement ) {
 	let startClientX = 0;
 	let startClientY = 0;
 	let offsetX = 0;

@@ -120,7 +120,7 @@ export default class MathliveUI extends Plugin {
 		const viewDocument = editor.editing.view.document;
 		this.listenTo( viewDocument, 'click', () => {
 			const mathliveCommand = editor.commands.get( 'mathlive' );
-			if ( mathliveConfig.openPanelWhenTexSelected && mathliveCommand?.isEnabled && mathliveCommand.value ) {
+			if ( mathliveConfig.openPanelWhenEquationSelected && mathliveCommand?.isEnabled && mathliveCommand.value ) {
 				this._showUI();
 			}
 		} );
@@ -136,6 +136,10 @@ export default class MathliveUI extends Plugin {
 		} );
 
 		editor.on( 'destroy', () => {
+			const panelCommand = this.mathPanelRoot?.[ pluginScopeName ].panelCommand;
+
+			panelCommand?.destroy();
+
 			this._hideUI();
 		} );
 	}

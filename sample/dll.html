@@ -89,6 +89,7 @@
 <script src="../node_modules/@ckeditor/ckeditor5-media-embed/build/media-embed.js"></script>
 <script src="../node_modules/@ckeditor/ckeditor5-list/build/list.js"></script>
 <script src="../node_modules/@ckeditor/ckeditor5-table/build/table.js"></script>
+<script src="../node_modules/@ckeditor/ckeditor5-alignment/build/alignment.js"></script>
 
 <!-- The "@yayure/ckeditor5-mathlive" package DLL build is served from the `build/` directory -->
 <script src="../build/mathlive.js"></script>
@@ -120,7 +121,8 @@
 				CKEditor5.table.TableToolbar,
 				CKEditor5.codeBlock.CodeBlock,
 				CKEditor5.basicStyles.Code,
-				CKEditor5.upload.Base64UploadAdapter
+				CKEditor5.upload.Base64UploadAdapter,
+				CKEditor5.alignment.Alignment,
 			],
 			mathlive: {
 				renderMathPanel: function( element ) {
@@ -143,6 +145,9 @@
 				'italic',
 				'link',
 				'code',
+				'|',
+				'alignment',
+				'|',
 				'bulletedList',
 				'numberedList',
 				'|',

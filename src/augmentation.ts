@@ -12,14 +12,19 @@ declare module '@ckeditor/ckeditor5-core' {
 		mathlive?: {
 
 			/**
-			 * Customize your formula panel.
+			 * Set up the math formula panel.
 			 */
 			renderMathPanel?: ( element: HTMLElement ) => ( () => void ) | undefined;
 
 			/**
-			 * Whether to open the panel when a formula is selected.
+			 * Whether to destroy the math formula panel when it is closed.
 			 */
-			openPanelWhenTexSelected?: boolean;
+			mathPanelDestroyOnClose?: boolean;
+
+			/**
+			 * Whether to open the panel when a equation is selected.
+			 */
+			openPanelWhenEquationSelected?: boolean;
 
 			/**
 			 * A string used as a regular expression of class names of elements whose content will be scanned for delimiters.

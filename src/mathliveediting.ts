@@ -21,7 +21,8 @@ export default class MathliveEditing extends Plugin {
 	constructor( editor: Editor ) {
 		super( editor );
 		editor.config.define( 'mathlive', {
-			openPanelWhenTexSelected: false,
+			mathPanelDestroyOnClose: false,
+			openPanelWhenEquationSelected: false,
 			processClass: 'tex2jax_process',
 			processScriptType: 'math/tex',
 			output: {
