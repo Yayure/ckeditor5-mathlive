@@ -1,18 +1,18 @@
 msgid ""
 msgstr ""
 "Language-Team: \n"
-"Language: zh_CN\n"
+"Language: zh_TW\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 
-msgctxt "工具栏插入公式按钮功能"
+msgctxt "工具欄插入公式按鈕功能"
 msgid "Insert math"
 msgstr "插入公式"
 
-msgctxt "面板插入按钮"
+msgctxt "面板插入按鈕"
 msgid "Insert"
 msgstr "插入"
 
-msgctxt "面板取消按钮"
+msgctxt "面板取消按鈕"
 msgid "Cancel"
 msgstr "取消"
