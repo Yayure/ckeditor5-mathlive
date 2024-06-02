@@ -28,21 +28,21 @@ declare module '@ckeditor/ckeditor5-core' {
 
 			/**
 			 * Convert elements containing this class name into visual formula displays.
-			 * e.g. <span class="tex2jax_process">\( \sqrt{\frac{a}{b}} \)</span>
+			 * e.g. <span class="tex2jax_process">\sqrt{\frac{a}{b}}</span>
 			 */
 			processClass?: string;
 
 			/**
 			 * Convert the <script> with attribute type set to this value into visual formula displays.
-			 * e.g. <script type="math/tex">\( \sqrt{\frac{a}{b}} \)</script>
+			 * e.g. <script type="math/tex">\sqrt{\frac{a}{b}}</script>
 			 */
 			processScriptType?: string;
 
 			/**
 			 * Visual formula output html data in CKEditor.
 			 * e.g.
-			 * { type: 'script', attributes: { type: 'math/tex' } } => <script type="math/tex">\( \sqrt{\frac{a}{b}} \)</script>
-			 * { type: 'span', attributes: { class: 'tex2jax_process' } } => <span class="tex2jax_process">\( \sqrt{\frac{a}{b}} \)</span>
+			 * { type: 'script', attributes: { type: 'math/tex' } } => <script type="math/tex">\sqrt{\frac{a}{b}}</script>
+			 * { type: 'span', attributes: { class: 'tex2jax_process' } } => <span class="tex2jax_process">\sqrt{\frac{a}{b}}</span>
 			 */
 			output?: {
 				type: string;

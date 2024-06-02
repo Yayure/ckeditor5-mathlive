@@ -5,7 +5,6 @@ import {
 	Widget,
 	viewToModelPositionOutsideModelElement
 } from 'ckeditor5/src/widget';
-import { extractDelimiters } from './utils';
 import type { DowncastWriter, Element, ViewElement, Writer } from 'ckeditor5/src/engine';
 import { CKEditorError } from 'ckeditor5/src/utils';
 
@@ -67,14 +66,14 @@ export default class MathliveEditing extends Plugin {
 		// View -> Model
 		conversion
 			.for( 'upcast' )
-			// (e.g. <span class="tex2jax_process">\( \sqrt{\frac{a}{b}} \)</span>)
+			// (e.g. <span class="tex2jax_process">\sqrt{\frac{a}{b}}</span>)
 			.elementToElement( {
 				view: {
 					classes: [ mathliveConfig.processClass! ]
 				},
 				model: createMathtexModel
 			} )
-			// (e.g. <script type="math/tex">\( \sqrt{\frac{a}{b}} \)</script>)
+			// (e.g. <script type="math/tex">\sqrt{\frac{a}{b}}</script>)
 			.elementToElement( {
 				view: {
 					name: 'script',
@@ -94,11 +93,11 @@ export default class MathliveEditing extends Plugin {
 			if ( child?.is( '$text' ) ) {
 				const equation = child.data.trim();
 
-				const params = extractDelimiters( equation );
-
 				return writer.createElement(
 					'mathlive-mathtex',
-					params
+					{
+						equation
+					}
 				);
 			}
 
@@ -195,7 +194,7 @@ export default class MathliveEditing extends Plugin {
 
 				writer.insert(
 					writer.createPositionAt( mathtexView, 0 ),
-					writer.createText( '\\(' + equation + '\\)' )
+					writer.createText( equation )
 				);
 
 				return mathtexView;

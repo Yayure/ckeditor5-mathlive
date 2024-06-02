@@ -1,6 +1,6 @@
 [English](./README.md) | 简体中文
 
-CKEditor 5 公式编辑器功能
+CKEditor 5 公式编辑器功能 &middot; [![npm version](https://img.shields.io/npm/v/@yayure/ckeditor5-mathlive.svg?style=flat)](https://www.npmjs.com/package/@yayure/ckeditor5-mathlive)
 ==========================
 
 ckeditor5-mathlive是一款基于[mathlive](https://cortexjs.io/mathlive)为CKEditor 5设计的公式编辑器。你可以对基于LaTex语法的公式进行插入、编辑和查看。同时该插件默认支持高达[800种LaTex语法](https://cortexjs.io/mathlive/reference/commands)。
@@ -83,9 +83,9 @@ ClassicEditor
         openPanelWhenEquationSelected: false,
         // 将含该类名的元素转换为可视化公式展示。如: <span class="tex2jax_process">\( \sqrt{\frac{a}{b}} \)</span>
         processClass: 'tex2jax_process',
-        // 将属性type为该值的script元素转换为可视化公式展示。如: <script type="math/tex">\( \sqrt{\frac{a}{b}} \)</script>
+        // 将属性type为该值的script元素转换为可视化公式展示。如: <script type="math/tex">\sqrt{\frac{a}{b}}</script>
         processScriptType: 'math/tex',
-        // 定义可视化公式在CKEditor中输出的html数据。如: { type: 'script', attributes: { type: 'math/tex' } } => <script type="math/tex">\( \sqrt{\frac{a}{b}} \)</script>
+        // 定义可视化公式在CKEditor中输出的html数据。如: { type: 'script', attributes: { type: 'math/tex' } } => <script type="math/tex">\sqrt{\frac{a}{b}}</script>
         output: {
             type: 'script',
             attributes: 'math/tex'

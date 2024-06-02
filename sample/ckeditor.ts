@@ -113,6 +113,9 @@ ClassicEditor
 		window.editor = editor;
 		CKEditorInspector.attach( editor );
 		window.console.log( 'CKEditor 5 is ready.', editor );
+		editor.model.document.on( 'change', () => {
+			console.log( editor.getData() );
+		} );
 	} )
 	.catch( err => {
 		window.console.error( err.stack );
