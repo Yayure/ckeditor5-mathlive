@@ -12,7 +12,7 @@ declare module '@ckeditor/ckeditor5-core' {
 		mathlive?: {
 
 			/**
-			 * Set up the math formula panel.
+			 * Mount the formula panel.
 			 */
 			renderMathPanel?: ( element: HTMLElement ) => ( () => void ) | undefined;
 
@@ -27,19 +27,19 @@ declare module '@ckeditor/ckeditor5-core' {
 			openPanelWhenEquationSelected?: boolean;
 
 			/**
-			 * A string used as a regular expression of class names of elements whose content will be scanned for delimiters.
+			 * Convert elements containing this class name into visual formula displays.
 			 * e.g. <span class="tex2jax_process">\( \sqrt{\frac{a}{b}} \)</span>
 			 */
 			processClass?: string;
 
 			/**
-			 * <script> tags with this type will be processed as LaTeX.
+			 * Convert the <script> with attribute type set to this value into visual formula displays.
 			 * e.g. <script type="math/tex">\( \sqrt{\frac{a}{b}} \)</script>
 			 */
 			processScriptType?: string;
 
 			/**
-			 * Output the element of html data.
+			 * Visual formula output html data in CKEditor.
 			 * e.g.
 			 * { type: 'script', attributes: { type: 'math/tex' } } => <script type="math/tex">\( \sqrt{\frac{a}{b}} \)</script>
 			 * { type: 'span', attributes: { class: 'tex2jax_process' } } => <span class="tex2jax_process">\( \sqrt{\frac{a}{b}} \)</span>

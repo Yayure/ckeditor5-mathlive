@@ -1,168 +1,106 @@
-@yayure/ckeditor5-mathlive
-==========================
+English | [简体中文](./README.zh-CN.md)
 
-This package was created by the [ckeditor5-package-generator](https://www.npmjs.com/package/ckeditor5-package-generator) package.
+CKEditor 5 mathematical formula editor feature
+==========================
+ckeditor5-mathlive is a formula editor designed for CKEditor 5 based on [mathlive](https://cortexjs.io/mathlive). You can insert, edit, and view formulas based on LaTeX syntax. Meanwhile, the plugin supports up to [800 LaTeX syntaxes](https://cortexjs.io/mathlive/reference/commands) by default.
 
 ## Table of contents
 
-* [Developing the package](#developing-the-package)
-* [Available scripts](#available-scripts)
-  * [`start`](#start)
-  * [`test`](#test)
-  * [`lint`](#lint)
-  * [`stylelint`](#stylelint)
-  * [`dll:build`](#dllbuild)
-  * [`dll:serve`](#dllserve)
-  * [`translations:collect`](#translationscollect)
-  * [`translations:download`](#translationsdownload)
-  * [`translations:upload`](#translationsupload)
-* [License](#license)
+- [Features](#features)
+- [Screenshots](#screenshots)
+- [Installation](#installation)
+  - [npm or yarn](#npm-or-yarn)
+- [Configuration](#configuration)
+- [Contributions & Translations](#contributions--translations)
 
-## Developing the package
+## Features
 
-To read about the CKEditor 5 framework, visit the [CKEditor5 documentation](https://ckeditor.com/docs/ckeditor5/latest/framework/index.html).
+- LaTeX syntax support
+- Visualization editing of formulas
+- Parsing configuration for LaTeX's text
+- LaTeX's text Output Configuration
+- Customizable visual formula editor panel
 
-## Available scripts
+## Screenshots
 
-Npm scripts are a convenient way to provide commands in a project. They are defined in the `package.json` file and shared with other people contributing to the project. It ensures that developers use the same command with the same options (flags).
+![Screenshot 1](/screenshots/1.png?raw=true "Screenshot 1")
 
-All the scripts can be executed by running `npm run <script>`. Pre and post commands with matching names will be run for those as well.
+## Installation
 
-The following scripts are available in the package.
+### npm or yarn
 
-### `start`
-
-Starts a HTTP server with the live-reload mechanism that allows previewing and testing plugins available in the package.
-
-When the server has been started, the default browser will open the developer sample. This can be disabled by passing the `--no-open` option to that command.
-
-You can also define the language that will translate the created editor by specifying the `--language [LANG]` option. It defaults to `'en'`.
-
-Examples:
+Install the necessary dependencies using npm or yarn
 
 ```bash
-# Starts the server and open the browser.
-npm run start
-
-# Disable auto-opening the browser.
-npm run start -- --no-open
-
-# Create the editor with the interface in German.
-npm run start -- --language=de
+npm install --save mathlive @yayure/ckeditor5-mathlive
 ```
-
-### `test`
-
-Allows executing unit tests for the package, specified in the `tests/` directory. The command accepts the following modifiers:
-
-* `--coverage` &ndash; to create the code coverage report,
-* `--watch` &ndash; to observe the source files (the command does not end after executing tests),
-* `--source-map` &ndash; to generate source maps of sources,
-* `--verbose` &ndash; to print additional webpack logs.
-
-Examples:
 
 ```bash
-# Execute tests.
-npm run test
-
-# Generate code coverage report after each change in the sources.
-npm run test -- --coverage --test
+yarn add mathlive @yayure/ckeditor5-mathlive
 ```
 
-### `lint`
+Add to CKEditor 5
 
-Runs ESLint, which analyzes the code (all `*.ts` files) to quickly find problems.
+```js
+import 'mathlive/static.css';
+import 'mathlive';
+import { Mathlive, MathlivePanelview } from '@yayure/ckeditor5-mathlive';
 
-Examples:
-
-```bash
-# Execute eslint.
-npm run lint
+ClassicEditor
+    .create( document.querySelector( '#editor' ), {
+        plugins: [ Mathlive, /** ... other plugins. */ ],
+        toolbar: {
+            items: [ 'mathlive', /** ... other toolbar buttons. */ ]
+        },
+        mathlive: {
+            renderMathPanel( element ) {
+                let panelView = new MathlivePanelview();
+                panelView.mount( element );
+                return () => {
+                    panelView.unmount();
+                    panelView = null;
+                }
+            }
+        },
+        // ... other configuration options.
+    } );
 ```
 
-### `stylelint`
+## Configuration
 
-Similar to the `lint` task, stylelint analyzes the CSS code (`*.css` files in the `theme/` directory) in the package.
+### Default Plugin Configuration
 
-Examples:
-
-```bash
-# Execute stylelint.
-npm run stylelint
+```js
+{
+    // ...
+    mathlive: {
+        // Mount the formula panel.
+        renderMathPanel: undefined,
+        // Whether to destroy the math formula panel when it is closed.
+        mathPanelDestroyOnClose: false,
+        // Whether to open the panel when a equation is selected.
+        openPanelWhenEquationSelected: false,
+        // Convert elements containing this class name into visual formula displays. e.g. <span class="tex2jax_process">\( \sqrt{\frac{a}{b}} \)</span>
+        processClass: 'tex2jax_process',
+        // Convert the <script> with attribute type set to this value into visual formula displays. e.g. <script type="math/tex">\( \sqrt{\frac{a}{b}} \)</script>
+        processScriptType: 'math/tex',
+        // Define the HTML data that the visualization formula outputs in CKEditor. e.g. { type: 'script', attributes: { type: 'math/tex' } } => <script type="math/tex">\( \sqrt{\frac{a}{b}} \)</script>
+        output: {
+            type: 'script',
+            attributes: 'math/tex'
+        }
+    }
+    // ...
+}
 ```
 
-### `dll:build`
+## Contributions & Translations
+Contributions, improvements and bug fixes are welcome. Development documentation can be found here [DEVELOPMENT.md](./DEVELOPMENT.md)。
 
-Creates a DLL-compatible package build which can be loaded into an editor using [DLL builds](https://ckeditor.com/docs/ckeditor5/latest/builds/guides/development/dll-builds.html).
+You can translate the following folders and files
 
-Examples:
-
-```bash
-# Build the DLL file that is ready to publish.
-npm run dll:build
-
-# Build the DLL file and listen to changes in its sources.
-npm run dll:build -- --watch
 ```
-
-### `dll:serve`
-
-Creates a simple HTTP server (without the live-reload mechanism) that allows verifying whether the DLL build of the package is compatible with the CKEditor 5 [DLL builds](https://ckeditor.com/docs/ckeditor5/latest/builds/guides/development/dll-builds.html).
-
-Examples:
-
-```bash
-# Starts the HTTP server and opens the browser.
-npm run dll:serve
+├─ lang
+├─ ├─ translations
+│  └─ contexts.json
 ```
-
-### `translations:collect`
-
-Collects translation messages (arguments of the `t()` function) and context files, then validates whether the provided values do not interfere with the values specified in the `@ckeditor/ckeditor5-core` package.
-
-The task may end with an error if one of the following conditions is met:
-
-* Found the `Unused context` error &ndash; entries specified in the `lang/contexts.json` file are not used in source files. They should be removed.
-* Found the `Context is duplicated for the id` error &ndash; some of the entries are duplicated. Consider removing them from the `lang/contexts.json` file, or rewrite them.
-* Found the `Context for the message id is missing` error &ndash; entries specified in source files are not described in the `lang/contexts.json` file. They should be added.
-
-Examples:
-
-```bash
-npm run translations:collect
-```
-
-### `translations:download`
-
-Download translations from the Transifex server. Depending on users' activity in the project, it creates translations files used for building the editor.
-
-The task requires passing the URL to Transifex API. Usually, it matches the following format: `https://www.transifex.com/api/2/project/[PROJECT_SLUG]`.
-
-To avoid passing the `--transifex` option every time when calls the command, you can store it in `package.json`, next to the `ckeditor5-package-tools translations:download` command.
-
-Examples:
-
-```bash
-npm run translations:download -- --transifex [API URL]
-```
-
-### `translations:upload`
-
-Uploads translation messages onto the Transifex server. It allows for the creation of translations into other languages by users using the Transifex platform.
-
-The task requires passing the URL to the Transifex API. Usually, it matches the following format: `https://www.transifex.com/api/2/project/[PROJECT_SLUG]`.
-
-To avoid passing the `--transifex` option every time when you call the command, you can store it in `package.json`, next to the `ckeditor5-package-tools translations:upload` command.
-
-Examples:
-
-```bash
-npm run translations:upload -- --transifex [API URL]
-```
-
-## License
-
-The `@yayure/ckeditor5-mathlive` package is available under [MIT license](https://opensource.org/licenses/MIT).
-
-However, it is the default license of packages created by the [ckeditor5-package-generator](https://www.npmjs.com/package/ckeditor5-package-generator) package and it can be changed.
