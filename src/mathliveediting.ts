@@ -55,7 +55,8 @@ export default class MathliveEditing extends Plugin {
 			allowWhere: '$text',
 			isInline: true,
 			isObject: true,
-			allowAttributes: [ 'alignment', 'fontSize', 'fontColor', 'fontBackgroundColor', 'equation' ]
+			allowAttributes: [ 'equation', 'alignment', 'fontSize', 'fontColor', 'fontBackgroundColor',
+				'bold', 'linkHref', 'code' ]
 		} );
 	}
 
