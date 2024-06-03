@@ -8,8 +8,8 @@ ckeditor5-mathlive is a formula editor designed for CKEditor 5 based on [mathliv
 
 - [Features](#features)
 - [Screenshots](#screenshots)
-- [Installation](#installation)
-  - [npm or yarn](#npm-or-yarn)
+- [Installation & Usage](#installation--usage)
+  - [npm](#npm)
 - [Configuration](#configuration)
 - [Contributions & Translations](#contributions--translations)
 
@@ -17,33 +17,36 @@ ckeditor5-mathlive is a formula editor designed for CKEditor 5 based on [mathliv
 
 - LaTeX syntax support
 - Visualization editing of formulas
-- Parsing configuration for LaTeX's text
-- LaTeX's text Output Configuration
+- Parsing configuration for LaTeX
+- LaTeX Output Configuration
 - Customizable visual formula editor panel
 
 ## Screenshots
 
 ![Screenshot 1](/screenshots/1.png?raw=true "Screenshot 1")
 
-## Installation
+## Installation & Usage
 
-### npm or yarn
+### npm
 
-Install the necessary dependencies using npm or yarn
-
-```bash
-npm install --save mathlive @yayure/ckeditor5-mathlive
-```
+Install and use the base dependency [mathlive](https://www.npmjs.com/package/mathlive) in your project or CKEditor 5 :
 
 ```bash
-yarn add mathlive @yayure/ckeditor5-mathlive
+npm install --save mathlive
 ```
-
-Add to CKEditor 5
 
 ```js
-import 'mathlive/static.css';
+import 'mathlive/dist/mathlive-static.css';
 import 'mathlive';
+```
+
+Install and use the plugin in your project or CKEditor 5 :
+
+```bash
+npm install --save @yayure/ckeditor5-mathlive
+```
+
+```js
 import { Mathlive, MathlivePanelview } from '@yayure/ckeditor5-mathlive';
 
 ClassicEditor

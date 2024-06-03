@@ -3,48 +3,51 @@
 CKEditor 5 公式编辑器功能 &middot; [![npm version](https://img.shields.io/npm/v/@yayure/ckeditor5-mathlive.svg?style=flat)](https://www.npmjs.com/package/@yayure/ckeditor5-mathlive)
 ==========================
 
-ckeditor5-mathlive是一款基于[mathlive](https://cortexjs.io/mathlive)为CKEditor 5设计的公式编辑器。你可以对基于LaTex语法的公式进行插入、编辑和查看。同时该插件默认支持高达[800种LaTex语法](https://cortexjs.io/mathlive/reference/commands)。
+ckeditor5-mathlive是一款基于[mathlive](https://cortexjs.io/mathlive)为CKEditor 5设计的公式编辑器。你可以对基于LaTeX语法的公式进行插入、编辑和查看。同时该插件默认支持高达[800种LaTeX语法](https://cortexjs.io/mathlive/reference/commands)。
 
 ## 目录
 
 - [功能](#功能)
 - [图例](#图例)
-- [安装](#安装)
-  - [npm or yarn](#npm-or-yarn)
+- [安装和使用](#安装和使用)
+  - [npm](#npm)
 - [配置](#配置)
 - [贡献和翻译](#贡献和翻译)
 
 ## 功能
 
-- LaTex语法支持
+- LaTeX语法支持
 - 对公式的可视化编辑
-- LaTex文本的解析配置
-- LaTex公式的文本输出配置
+- LaTeX文本的解析配置
+- LaTeX公式的文本输出配置
 - 自定义可视化公式编辑器面板
 
 ## 图例
 
 ![图例 1](/screenshots/1.zh-cn.png?raw=true "图例 1")
 
-## 安装
+## 安装和使用
 
-### npm or yarn
+### npm
 
-使用npm或yarn安装相关依赖包
-
-```bash
-npm install --save mathlive @yayure/ckeditor5-mathlive
-```
+在你的项目或CKEditor 5中安装和使用基础依赖[mathlive](https://www.npmjs.com/package/mathlive) :
 
 ```bash
-yarn add mathlive @yayure/ckeditor5-mathlive
+npm install --save mathlive
 ```
-
-添加到CKEditor 5
 
 ```js
-import 'mathlive/static.css';
+import 'mathlive/dist/mathlive-static.css';
 import 'mathlive';
+```
+
+在你的项目或CKEditor 5中安装和使用该插件 :
+
+```bash
+npm install --save @yayure/ckeditor5-mathlive
+```
+
+```js
 import { Mathlive, MathlivePanelview } from '@yayure/ckeditor5-mathlive';
 
 ClassicEditor
