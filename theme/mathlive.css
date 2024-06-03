@@ -6,6 +6,10 @@
 	z-index: 999;
 }
 
+.ck-mathlive-panelhook ~ #mathlive-suggestion-popover {
+	z-index: 1000;
+}
+
 .ck-math-field {
 	position: relative;
 	display: inline-block;

@@ -87,7 +87,7 @@ ClassicEditor
 				panelView.mount( element );
 
 				return () => {
-					panelView?.unmount();
+					panelView?.destroy();
 					panelView = null;
 				};
 			}

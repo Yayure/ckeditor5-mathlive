@@ -8,10 +8,6 @@
 	display: none;
 } */
 
-.ck-mathlive-panelhook + #mathlive-suggestion-popover {
-	z-index: 1000;
-}
-
 .ck-mathlive-panel {
 	position: fixed;
 	bottom: 16px;

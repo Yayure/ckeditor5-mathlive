@@ -26,7 +26,7 @@ export default class MathliveUI extends Plugin {
 	}
 
 	public mathPanelRoot: ( HTMLElement & pluginScopeType ) | null = null;
-	public mathPanelRootUnmount: ( () => void ) | undefined = undefined;
+	public mathPanelRootDestroy: ( () => void ) | undefined = undefined;
 
 	public init(): void {
 		const editor = this.editor;

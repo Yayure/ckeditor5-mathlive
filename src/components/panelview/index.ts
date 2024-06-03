@@ -1,28 +1,20 @@
 /**
  * Based on mathlive,see more: https://cortexjs.io/mathlive/
  */
-
-import type { Editor } from 'ckeditor5/src/core';
 import type { MathfieldElement as MathfieldElementType } from 'mathlive';
 import '../../../theme/panelview.css';
 import latexIconMarkupMap from './latexmarkupmap';
 
-declare global {
-	const MathfieldElement: MathfieldElementType | undefined;
-}
-
-declare function CommandEventOn( event: 'mounted', callback: () => void ): void;
-declare function CommandEventOn( event: 'refocus' | 'reopen', callback: ( _: unknown, equation: string ) => void ): void;
-
-declare function CommandEventFire( event: 'insert', equation: string ): void;
-declare function CommandEventFire( event: 'close' ): void;
-
 interface PanelCommand {
-	editor: Editor;
+	editor: {
+		t: ( text: string ) => string;
+	};
 	value: string | undefined;
 	off: ( event: 'mounted' | 'refocus' | 'reopen' ) => void;
-	on: typeof CommandEventOn;
-	fire: typeof CommandEventFire;
+	on( event: 'mounted', callback: () => void ): void;
+	on( event: 'refocus' | 'reopen', callback: ( _: unknown, equation: string ) => void ): void;
+	fire( event: 'close' ): void;
+	fire( event: 'insert', equation: string ): void;
 }
 
 const pluginScopeName = '_ckeditor5Mathlive';
@@ -33,7 +25,7 @@ export default class PanelView {
 	}
 
 	public equation = '';
-	public unmount: () => void = () => {};
+	public destroy: () => void = () => {};
 
 	public mount( hookContainer: HTMLElement ): void {
 		// Get ckeditor5Mathlive panelCommand.
@@ -112,15 +104,15 @@ export default class PanelView {
 			mathField.focus();
 		} );
 
-		this.unmount = () => {
-			formulaView.unmount();
+		this.destroy = () => {
+			formulaView.destroy();
 			panelCommand.off( 'refocus' );
 			panelCommand.off( 'reopen' );
 			hookContainer?.removeChild( container );
 		};
 	}
 
-	public render( translate: Editor['t'] ): HTMLElement {
+	public render( translate: PanelCommand['editor']['t'] ): HTMLElement {
 		const container = document.createElement( 'div' );
 		container.className = 'ck-mathlive-panel';
 		const html = `
@@ -146,9 +138,9 @@ export default class PanelView {
 	}
 
 	public setMathfieldElementConfig(): void {
-		if ( typeof MathfieldElement !== 'undefined' ) {
+		if ( typeof window.MathfieldElement !== 'undefined' ) {
 			// Disabled sounds of mathField.
-			MathfieldElement.soundsDirectory = null;
+			window.MathfieldElement.soundsDirectory = null;
 		}
 	}
 }
@@ -158,7 +150,7 @@ export class FormulaView {
 		this.props = props;
 	}
 
-	public unmount: () => void = () => {};
+	public destroy: () => void = () => {};
 	public hookContainer: HTMLElement | null = null;
 	public props?: {
 		onMathTexClick?: (
@@ -391,13 +383,13 @@ export class FormulaView {
 
 		hookContainer?.appendChild( container );
 
-		this.unmount = () => {
+		this.destroy = () => {
 			hookContainer?.removeChild( container );
 		};
 	}
 
 	public remount(): void {
-		this.unmount();
+		this.destroy();
 
 		this.mount( this.hookContainer );
 	}

@@ -67,7 +67,7 @@ export class MathlivePanelCommand extends Command {
 
 		if ( !this.isMounted ) {
 			// Mount panel.
-			const mathPanelRootUnmount = mathliveConfig.renderMathPanel( mathPanelRoot );
+			const mathPanelRootDestroy = mathliveConfig.renderMathPanel( mathPanelRoot );
 
 			// The panel has been mounted, and the listening panel inserts the formula.
 			this.on( 'insert', ( eventInfo, equation = '' ) => {
@@ -81,7 +81,7 @@ export class MathlivePanelCommand extends Command {
 			// Register Destroy.
 			this.destroy = () => {
 				this.stopListening();
-				mathPanelRootUnmount?.();
+				mathPanelRootDestroy?.();
 
 				if ( body.contains( mathPanelRoot ) ) {
 					body.removeChild( mathPanelRoot );

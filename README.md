@@ -57,7 +57,7 @@ ClassicEditor
                 let panelView = new MathlivePanelview();
                 panelView.mount( element );
                 return () => {
-                    panelView.unmount();
+                    panelView.destroy();
                     panelView = null;
                 }
             }
