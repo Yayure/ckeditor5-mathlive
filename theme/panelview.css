@@ -124,17 +124,15 @@
 	width: 100%;
 }
 
-
 .ck-mathlive-formula-toolbar {
 	display: flex;
 	padding: 6px 0;
 	gap: 8px;
-	height: 32px;
 }
 
 .ck-mathlive-formula-tab {
 	position: relative;
-	padding: 0 8px;
+	padding: 2px 8px;
 	display: flex;
 	align-items: center;
 	justify-content: center;

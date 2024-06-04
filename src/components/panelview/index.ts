@@ -86,6 +86,9 @@ export default class PanelView {
 				} catch ( error ) {
 					console.warn( error );
 				}
+			},
+			onFormulaTabClick: () => {
+				mathField.focus();
 			}
 		} );
 		formulaView.mount( formulaContainer );
@@ -161,6 +164,7 @@ export class FormulaView {
 				customInsert?: ( mathField: MathfieldElementType ) => void;
 			}
 		) => void;
+		onFormulaTabClick?: ( key: string ) => void;
 	} = undefined;
 	public activeTabKey = 'SUPAndSUB-fraction-radical';
 	public formulaTabs = [ {
@@ -366,6 +370,7 @@ export class FormulaView {
 			element.addEventListener( 'click', e => {
 				const key = ( e.target as HTMLDivElement )?.getAttribute( 'key' ) || '';
 				this.activeTabKey = key;
+				props?.onFormulaTabClick?.( key );
 				this.remount();
 			} );
 		} );
