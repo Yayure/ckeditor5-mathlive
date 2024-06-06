@@ -124,18 +124,6 @@
 				CKEditor5.upload.Base64UploadAdapter,
 				CKEditor5.alignment.Alignment,
 			],
-			mathlive: {
-				renderMathPanel: function( element ) {
-					let panelView = new CKEditor5[ 'mathlive' ].MathlivePanelview();
-
-					panelView.mount( element );
-
-					return () => {
-						panelView?.destroy();
-						panelView = null;
-					};
-				}
-			},
 			toolbar: [
 				'mathlive',
 				'|',
@@ -163,6 +151,18 @@
 				'undo',
 				'redo'
 			],
+			mathlive: {
+				renderMathPanel: function( element ) {
+					let panelView = new CKEditor5[ 'mathlive' ].MathlivePanelview();
+
+					panelView.mount( element );
+
+					return () => {
+						panelView?.destroy();
+						panelView = null;
+					};
+				}
+			},
 			image: {
 				toolbar: [
 					'imageStyle:inline',

@@ -8,9 +8,11 @@ ckeditor5-mathlive是一款基于[mathlive](https://cortexjs.io/mathlive)为CKEd
 ## 目录
 
 - [功能](#功能)
+- [演示](#演示)
 - [图例](#图例)
 - [安装和使用](#安装和使用)
   - [npm](#npm)
+  - [CDN](#cdn)
 - [配置](#配置)
 - [贡献和翻译](#贡献和翻译)
 
@@ -21,6 +23,10 @@ ckeditor5-mathlive是一款基于[mathlive](https://cortexjs.io/mathlive)为CKEd
 - LaTeX文本的解析配置
 - LaTeX公式的文本输出配置
 - 自定义可视化公式编辑器面板
+
+## 演示
+
+[Classic editor with CDN](https://jsfiddle.net/Yayure/ymph7stk/)
 
 ## 图例
 
@@ -67,7 +73,42 @@ ClassicEditor
             }
         },
         // ... 其他配置项
-    } );
+    } )
+```
+
+### CDN
+
+添加基础依赖和该插件 :
+
+```html
+<head>
+    <!-- ... 其他CKEditor资源 -->
+
+    <link rel="stylesheet" href="https://unpkg.com/mathlive/dist/mathlive-static.css" />
+    <script defer src="https://unpkg.com/mathlive"></script>
+    <script src="https://unpkg.com/@yayure/ckeditor5-mathlive/build/mathlive.js"></script>
+</head>
+```
+
+使用该插件 :
+
+```js
+CKEditor5.editorClassic.ClassicEditor
+    .create( document.querySelector( '#editor' ), {
+        plugins: [ CKEditor5.mathlive.Mathlive, /** ... 其他插件 */ ],
+        toolbar: [ 'mathlive', /** ... 其他工具栏按钮 */ ],
+        mathlive: {
+            renderMathPanel( element ) {
+                let panelView = new CKEditor5.mathlive.MathlivePanelview();
+                panelView.mount( element );
+                return () => {
+                    panelView.destroy();
+                    panelView = null;
+                }
+            }
+        },
+        // ... 其他配置项
+    } )
 ```
 
 ## 配置

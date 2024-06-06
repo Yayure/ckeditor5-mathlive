@@ -7,9 +7,11 @@ ckeditor5-mathlive is a formula editor designed for CKEditor 5 based on [mathliv
 ## Table of contents
 
 - [Features](#features)
+- [Demos](#demos)
 - [Screenshots](#screenshots)
 - [Installation & Usage](#installation--usage)
   - [npm](#npm)
+  - [CDN](#cdn)
 - [Configuration](#configuration)
 - [Contributions & Translations](#contributions--translations)
 
@@ -20,6 +22,10 @@ ckeditor5-mathlive is a formula editor designed for CKEditor 5 based on [mathliv
 - Parsing configuration for LaTeX
 - LaTeX Output Configuration
 - Customizable visual formula editor panel
+
+## Demos
+
+[Classic editor with CDN](https://jsfiddle.net/Yayure/ymph7stk/)
 
 ## Screenshots
 
@@ -51,9 +57,9 @@ import { Mathlive, MathlivePanelview } from '@yayure/ckeditor5-mathlive';
 
 ClassicEditor
     .create( document.querySelector( '#editor' ), {
-        plugins: [ Mathlive, /** ... other plugins. */ ],
+        plugins: [ Mathlive, /** ... Other plugins. */ ],
         toolbar: {
-            items: [ 'mathlive', /** ... other toolbar buttons. */ ]
+            items: [ 'mathlive', /** ... Other toolbar buttons. */ ]
         },
         mathlive: {
             renderMathPanel( element ) {
@@ -65,8 +71,43 @@ ClassicEditor
                 }
             }
         },
-        // ... other configuration options.
-    } );
+        // ... Other configuration options.
+    } )
+```
+
+### CDN
+
+Add basic dependencies and the plugin :
+
+```html
+<head>
+    <!-- ... Other CKEditor Resources. -->
+
+    <link rel="stylesheet" href="https://unpkg.com/mathlive/dist/mathlive-static.css" />
+    <script defer src="https://unpkg.com/mathlive"></script>
+    <script src="https://unpkg.com/@yayure/ckeditor5-mathlive/build/mathlive.js"></script>
+</head>
+```
+
+Using the plugin :
+
+```js
+CKEditor5.editorClassic.ClassicEditor
+    .create( document.querySelector( '#editor' ), {
+        plugins: [ CKEditor5.mathlive.Mathlive, /** ... other plugins. */ ],
+        toolbar: [ 'mathlive', /** ... Other toolbar buttons. */ ],
+        mathlive: {
+            renderMathPanel( element ) {
+                let panelView = new CKEditor5.mathlive.MathlivePanelview();
+                panelView.mount( element );
+                return () => {
+                    panelView.destroy();
+                    panelView = null;
+                }
+            }
+        },
+        // ... Other configuration options.
+    } )
 ```
 
 ## Configuration
