@@ -131,7 +131,9 @@ CKEditor5.editorClassic.ClassicEditor
         // Define the HTML data that the visualization formula outputs in CKEditor. e.g. { type: 'script', attributes: { type: 'math/tex' } } => <script type="math/tex">\sqrt{\frac{a}{b}}</script>
         output: {
             type: 'script',
-            attributes: 'math/tex'
+            attributes: {
+                type: 'math/tex'
+            }
         }
     }
     // ...

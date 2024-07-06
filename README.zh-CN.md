@@ -132,7 +132,9 @@ CKEditor5.editorClassic.ClassicEditor
         // 定义可视化公式在CKEditor中输出的html数据。如: { type: 'script', attributes: { type: 'math/tex' } } => <script type="math/tex">\sqrt{\frac{a}{b}}</script>
         output: {
             type: 'script',
-            attributes: 'math/tex'
+            attributes: {
+               type: 'math/tex'
+            }
         }
     }
     // ...
