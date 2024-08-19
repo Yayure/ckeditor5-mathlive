@@ -119,17 +119,33 @@ CKEditor5.editorClassic.ClassicEditor
 {
     // ...
     mathlive: {
-        // 挂载公式面板。
+        /**
+         * 挂载公式面板。
+         */
         renderMathPanel: undefined,
-        // 面板关闭时是否销毁。
+        /**
+         * 面板关闭时是否销毁。
+         */
         mathPanelDestroyOnClose: false,
-        // 选中CKEditor编辑器中的公式时是否打开面板。
+        /**
+         * 选中CKEditor编辑器中的公式时是否打开面板。
+         */
         openPanelWhenEquationSelected: false,
-        // 将含该类名的元素转换为可视化公式展示。如: <span class="tex2jax_process">\( \sqrt{\frac{a}{b}} \)</span>
+        /**
+         * 将含该类名的元素转换为可视化公式展示。
+         * 如: <span class="tex2jax_process">\( \sqrt{\frac{a}{b}} \)</span>
+         */
         processClass: 'tex2jax_process',
-        // 将属性type为该值的script元素转换为可视化公式展示。如: <script type="math/tex">\sqrt{\frac{a}{b}}</script>
+        /**
+         * 将属性type为该值的script元素转换为可视化公式展示。
+         * 如: <script type="math/tex">\sqrt{\frac{a}{b}}</script>
+         */
         processScriptType: 'math/tex',
-        // 定义可视化公式在CKEditor中输出的html数据。如: { type: 'script', attributes: { type: 'math/tex' } } => <script type="math/tex">\sqrt{\frac{a}{b}}</script>
+        /**
+         * 定义可视化公式在CKEditor中输出的html数据。
+         * 如: { type: 'script', attributes: { type: 'math/tex' } } => <script type="math/tex">\sqrt{\frac{a}{b}}</script>
+         * { type: 'span', attributes: { class: 'math-tex' } } => <span class="math-tex">\sqrt{\frac{a}{b}}</span>
+         */
         output: {
             type: 'script',
             attributes: {

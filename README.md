@@ -118,17 +118,33 @@ CKEditor5.editorClassic.ClassicEditor
 {
     // ...
     mathlive: {
-        // Mount the formula panel.
+        /**
+         * Mount the formula panel.
+         */
         renderMathPanel: undefined,
-        // Whether to destroy the math formula panel when it is closed.
+        /**
+         * Whether to destroy the math formula panel when it is closed.
+         */
         mathPanelDestroyOnClose: false,
-        // Whether to open the panel when a equation is selected.
+        /**
+         * Whether to open the panel when a equation is selected.
+         */
         openPanelWhenEquationSelected: false,
-        // Convert elements containing this class name into visual formula displays. e.g. <span class="tex2jax_process">\sqrt{\frac{a}{b}}</span>
+        /**
+         * Convert elements containing this class name into visual formula displays.
+         * e.g. <span class="tex2jax_process">\sqrt{\frac{a}{b}}</span>
+         */
         processClass: 'tex2jax_process',
-        // Convert the <script> with attribute type set to this value into visual formula displays. e.g. <script type="math/tex">\sqrt{\frac{a}{b}}</script>
+        /**
+         * Convert the <script> with attribute type set to this value into visual formula displays.
+         * e.g. <script type="math/tex">\sqrt{\frac{a}{b}}</script>
+         */
         processScriptType: 'math/tex',
-        // Define the HTML data that the visualization formula outputs in CKEditor. e.g. { type: 'script', attributes: { type: 'math/tex' } } => <script type="math/tex">\sqrt{\frac{a}{b}}</script>
+        /**
+         * Define the HTML data that the visualization formula outputs in CKEditor.
+         * e.g. { type: 'script', attributes: { type: 'math/tex' } } => <script type="math/tex">\sqrt{\frac{a}{b}}</script>
+         * { type: 'span', attributes: { class: 'math-tex' } } => <span class="math-tex">\sqrt{\frac{a}{b}}</span>
+         */
         output: {
             type: 'script',
             attributes: {

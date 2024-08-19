@@ -1,7 +1,6 @@
 import type { Mathlive } from './index';
-import type { DowncastWriter } from 'ckeditor5/src/engine';
 
-type ElementAttributes = Parameters<DowncastWriter['createContainerElement']>[1];
+type ElementAttributes = Record<string, string>;
 
 declare module '@ckeditor/ckeditor5-core' {
 	interface PluginsMap {

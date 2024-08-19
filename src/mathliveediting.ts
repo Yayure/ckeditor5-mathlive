@@ -19,6 +19,7 @@ export default class MathliveEditing extends Plugin {
 
 	constructor( editor: Editor ) {
 		super( editor );
+		const mathliveConfig = editor.config.get( 'mathlive' );
 		editor.config.define( 'mathlive', {
 			mathPanelDestroyOnClose: false,
 			openPanelWhenEquationSelected: false,
@@ -26,7 +27,7 @@ export default class MathliveEditing extends Plugin {
 			processScriptType: 'math/tex',
 			output: {
 				type: 'script',
-				attributes: {
+				attributes: mathliveConfig?.output?.attributes ? mathliveConfig.output.attributes : {
 					type: 'math/tex'
 				}
 			}
@@ -81,6 +82,13 @@ export default class MathliveEditing extends Plugin {
 					attributes: {
 						type: 'math/tex'
 					}
+				},
+				model: createMathtexModel
+			} )
+			.elementToElement( {
+				view: {
+					name: mathliveConfig.output!.type,
+					attributes: mathliveConfig.output!.attributes
 				},
 				model: createMathtexModel
 			} );

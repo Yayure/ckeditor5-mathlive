@@ -90,6 +90,12 @@ ClassicEditor
 					panelView?.destroy();
 					panelView = null;
 				};
+			},
+			output: {
+				type: 'span',
+				attributes: {
+					class: 'math-tex'
+				}
 			}
 		},
 		image: {
