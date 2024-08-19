@@ -282,7 +282,7 @@ export class FormulaView {
 			[
 				'\\dot{#0}', '\\ddot{#0}', '\\mathring{#0}', '\\hat{#0}', '\\check{#0}', '\\acute{#0}', '\\grave{#0}', '\\breve{#0}',
 				'\\widetilde{#0}', '\\bar{#0}', '\\bar{\\bar{#0}}', '\\vec{#0}', '\\overbrace{#0}', '\\underbrace{#0}', '\\boxed{#0}',
-				'\\boxed{a^2+b^2=c^2}', '\\overline{#0}', '\\overline{#0}', '\\underline{#0}', '\\overline{A}', '\\overline{ABC}',
+				'\\boxed{a^2+b^2=c^2}', '\\overline{#0}', '\\underline{#0}', '\\overline{A}', '\\overline{ABC}',
 				'\\overline{x\\oplus y}'
 			],
 			[
