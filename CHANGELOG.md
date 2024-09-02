@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [41.4.0](https://github.com/Yayure/ckeditor5-mathlive/compare/v41.3.1...v41.4.0) (2024-09-02)
+
+
+### Features
+
+* Support output parsing ([f74a4ba](https://github.com/Yayure/ckeditor5-mathlive/commit/f74a4ba39ed78b3a705a206653a039ece60206d4))
+
+
+### Bug Fixes
+
+* Panel duplicate latex ([0f2e466](https://github.com/Yayure/ckeditor5-mathlive/commit/0f2e46686e232726ced6dbd9ba7c02e1bd59ffff))
+
 ### 41.3.1 (2024-06-06)
 
 
